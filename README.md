@@ -1,1 +1,1 @@
-__Useful scripts for bioinformatic tasks__
+#Useful scripts for bioinformatic tasks
