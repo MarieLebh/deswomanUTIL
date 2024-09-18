@@ -23,14 +23,14 @@ def merge_intervals(intervals):
     return merged
 
 def overlap_intervals(intervals1, intervals2):
-   #Get the overlapping intervals from two lists of intervals
     overlapping_intervals = []
-    for interval1 in intervals1:
-        for interval2 in intervals2:
-            if (interval1[0] <= interval2[1] and
-                    interval2[0] <= interval1[1]):
-                start = max(interval1[0], interval2[0])
-                end = min(interval1[1], interval2[1])
+    intervals1 = [intervals1[0]]
+    for i in intervals1:
+        for j in intervals2:
+            if (int(i[0]) <= int(j[1]) and int(j[0]) <= int(i[1])):
+                # Merge overlapping intervals
+                start = max(int(i[0]), int(j[0]))
+                end = min(int(i[1]), int(j[1]))
                 overlapping_intervals.append([start, end])
     return overlapping_intervals
 
