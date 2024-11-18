@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import sys
 def gff2bed():
     #Transform gff/gtf files to bedfiles
     #Usage python3 gff2bed.py path_to_gff outfilename
