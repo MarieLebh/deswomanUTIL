@@ -13,7 +13,7 @@ Run like this: python3 Fai_converter.py --in FaiFile (--out Outname)
 
 #initiate the input 
 parser = argparse.ArgumentParser(description='The tool will create a bed(3)file with these columns: ChromName, Start(=0), Stop(=ChromLength)',epilog="-------------------------")
-parser.add_argument("--in", help="Path to the Genome index file (.fai)", type=str)
+parser.add_argument("--inp", help="Path to the Genome index file (.fai)", type=str)
 parser.add_argument("--out", help="Path to the Output file (.bed). Default: 'PathToInput_ChromLength.bed'", type=str, default = "Test")
 
 def index_to_chromLengthbed(path, OutPath):
@@ -35,7 +35,7 @@ def index_to_chromLengthbed(path, OutPath):
 
 if __name__ == "__main__":
     print("-------------------------\nCreate Chromosome Length Bedfiles from Fasta index(.fai)\nV.1.0\nAuthor:Marie Lebherz\n-------------------------\n")
-    File = parser.parse_args().i
+    File = parser.parse_args().inp
     if not File:
         print("No argument supplied. Exiting...")
         sys.exit()
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     if File[-4:] != ".fai":
         print(f"Please supply a .fai file!\nThe problematic file is: {File}")
         sys.exit()
-    OutputName = parser.parse_args().o
+    OutputName = parser.parse_args().out
     print("Start extracting the information...")
     index_to_chromLengthbed(File, OutputName)
     print("Finished extracting the chromosome length file.")
