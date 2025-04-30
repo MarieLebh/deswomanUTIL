@@ -1,5 +1,5 @@
 # Useful scripts for bioinformatic tasks
-These are some scripts that I use multiple times. They are not perfect or efficient but they work. 
+Here are some scripts I wrote for tasks I needed to run multiple times.
 
 __1) check_rnaseq_data.py__
 This script uses [RSeQC](https://doi.org/10.1093/bioinformatics/bts356) to determine whether a set of RNAseq data is stranded.
