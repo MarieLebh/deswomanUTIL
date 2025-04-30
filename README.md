@@ -11,3 +11,4 @@ Convert a genome index file (.fai) to a chromosome length bed3file (ChromName 0 
 
 __3) gff2bed.py__
 Transform a gff file to a bedfile. 
+```python3 gff2bed.py --inp GFFFile (--out Outname (no suffix)) (--type Type (e.g. gene/mRNA/transcript, ...))```
