@@ -8,7 +8,7 @@ import os
 Fai Converter (Fai to Chrom Length bed3)
 Author: Marie
 Date: 30.04.25
-Run like this: python3 Fai_converter.py --in FaiFile (--out Outname)
+Run like this: python3 Fai_converter.py --inp FaiFile (--out Outname)
 """
 
 #initiate the input 
