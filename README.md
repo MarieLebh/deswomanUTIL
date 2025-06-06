@@ -29,9 +29,9 @@ Transform a gff/gtf file to a bedfile (bed6).
 ## 4) filterDESwoMAN.py
 Filter the output of [DESwoMAN](https://github.com/AnnaGrBio/DESWOMAN) to get a dataset of high confidence _de novo_ originated neORFs.
 It is important that you did the following steps before running:
-1) You ran DESwoMAN on a set of species
-2) You ran Orthofinder on all of the resulting neORFs to get Orthogroups
-3) You have a newick tree with all sampes in your analysis
+1) You ran DESwoMAN on one or multiple species.
+2) You ran Orthofinder for all query species in your DESwoMAN runs and used the resulting neORFs to get Orthogroups
+3) You have a newick tree with all species (in- and outgroups) in your analysis
 4) Your samples have a four letter species id optionally followed by a sample id (if applicable) e.g. Dmel (for _Drosophila melanogaster_) or Hsap (for _Homo sapiens_). 
 
 - `--te_db` Path to a fasta TE database of your organism (str)
