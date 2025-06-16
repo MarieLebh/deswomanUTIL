@@ -29,11 +29,11 @@ Transform a gff/gtf file to a bedfile (bed6).
 ## 4) filterDESwoMAN.py
 Filter the output of [DESwoMAN](https://github.com/AnnaGrBio/DESWOMAN) to get a dataset of high confidence _de novo_ originated neORFs.
 It is important that you did the following steps before running:
-1) You ran DESwoMAN on one or multiple species.
-2) You ran Orthofinder for all query species in your DESwoMAN runs and used the resulting neORFs to get Orthogroups
-3) You have a newick tree with all species (in- and outgroups) in your analysis
-4) Your samples have a four letter species id optionally followed by a sample id (if applicable) e.g. Dmel (for _Drosophila melanogaster_) or Hsap (for _Homo sapiens_). 
+1) You ran DESwoMAN on one or multiple species. The output for each species needs to be in a separate folder with the full name (e.g. DmelZI or DsubFAL). This is also true when you only ran it for one species!
+2) You have a newick tree with all species (in- and outgroups) in your analysis (even if you also have populations this tree needs to contain 4 letter species ids). It is important that all internal nodes are named. Also no polytonies are allowed as this will lead to errors!
+3) Your samples have a four letter species id optionally followed by a sample id (if applicable) e.g. Dmel (for _Drosophila melanogaster_) or Hsap (for _Homo sapiens_).
 
+- `--te_check` Blast against an TE database  (default = false)
 - `--te_db` Path to a fasta TE database of your organism (str)
 - `--te_cov` Blast coverage for TE search (float, default = 80)
 - `--te_idt` Percent identity for TE search (float, default = 80)
@@ -51,4 +51,4 @@ It is important that you did the following steps before running:
 - `--species_file` Text file with all samples listed (one per line, str)
 
 __Usage:__
-```python3 GetHighConfidenceNeORFs.py --te_db Database.fa --ortho Orthofinder/OrthoFinder/Results/Orthogroups.txt --deswoman ./ --out FilteredResults```
+```python3 filterDESwoMAN.py --te_db Database.fa --ortho Orthofinder/OrthoFinder/Results/Orthogroups.txt --deswoman ./ --out FilteredResults```
