@@ -8,11 +8,16 @@ from Bio import Phylo
 from io import StringIO
 
 """
-Create a subset of high confidence neORFs
+GET A SUBSET OF HIGH CONFIDENCE DE NOVO ORFs
+This script filters the DESwoMAN output based on the following phylogeny
 Author: Marie
 Date: 16.05.25
+Edited: 04.08.25
 
-This script filters the DESwoMAN output based on the following phylogeny:
+How to run:
+usage: python3 FilterORFsForDeNovoOrigin.py [-h] [--te_db TE_DB] [--te_cov TE_COV] [--te_idt TE_IDT] [--te_eval TE_EVAL] [--ortho ORTHO] [--deswoman DESWOMAN] [--rna_check]
+                                    [--te_check] [--tr_db TR_DB] [--tr_cov TR_COV] [--tr_idt TR_IDT] [--tr_eval TR_EVAL] [--tr_strand TR_STRAND] [--out OUT]
+                                    [--tree TREE] [--species_file SPECIES_FILE]
 
 CRITERIA FOR FILTERING:
 
@@ -21,8 +26,16 @@ CRITERIA FOR FILTERING:
     If there is a species with no coding mutation present that species is added to the coding species.
 """
 
-def get_populations(SpeciesList):
-    #Read in a text file with one population in each line
+def get_populations(SpeciesList:str)->list:
+    """
+    Read in a text file with one population/id on each line
+
+    Parameters: 
+    - Filepath (str): Path to the file with the sample ids
+
+    Returns:
+    -list: list of lines
+    """
     Strains = []
     Info = open(SpeciesList, "r")
     for line in Info:
@@ -30,8 +43,17 @@ def get_populations(SpeciesList):
         Strains.append(l)
     return Strains
 
-def find_common_node(newick, species_list):
-    #Input a tree and a list of species and return their most recent common ancestor
+def find_common_node(newick:str, species_list:list)->str:
+    """
+    Input a tree and a list of species and return their most recent common ancestor
+
+    Parameters: 
+    - newick (str): Path to the newick file
+    - species_list (list): List of species names (need to all be in the newick file)
+
+    Returns:
+    -list: list of lines
+    """
     tree = Phylo.read(newick, "newick")
     # Normalize species names (remove dots if needed, optional depending on your data)
     species_list = [s.replace(" ", "").strip() for s in species_list]
@@ -40,8 +62,17 @@ def find_common_node(newick, species_list):
     # Return the name of the MRCA node
     return mrca.name
 
-def get_outgroup_from_clade_name(tree, clade_name):
-    #Input a clade name (needs to be included in the tree), it will return all terminal branches who are outgroups
+def get_outgroup_from_clade_name(tree:str, clade_name:str)->list:
+    """
+    Input a clade name (needs to be included in the tree), it will return all terminal branches who are outgroups
+
+    Parameters: 
+    - tree (str): Path to the newick file
+    -clade_name (str): The name of the clade of interest. 
+
+    Returns:
+    -list: list of lines
+    """
     # Step 1: Find the target clade by name
     tree = Phylo.read(tree, "newick")
     target_clade = None
@@ -59,7 +90,18 @@ def get_outgroup_from_clade_name(tree, clade_name):
     outgroup = sorted(all_terminals - ingroup)
     return outgroup
 
-def read_orthogroups_info(OrthoPath, PathToDESwoMAN, SpeciesList):
+def read_orthogroups_info(OrthoPath:str, PathToDESwoMAN:str, SpeciesList:str)->dict:
+    """
+    Make a dictionary with all coding homologs
+
+    Parameters: 
+    -OrthoPath(str): Path to the "Orthogroups.txt" foöe
+    -PathToDESwoMAN(str): Path to the DESwoMAN folder
+    - SpeciesList: File with all species (.txts)
+
+    Returns:
+    -dict: Dictionary of coding homologs. 
+    """
     #For the species instead of looking at the number of species in an orthogroup also add the tree
     Specs = get_populations(SpeciesList)
     if OrthoPath == "NotSupplied":
@@ -92,8 +134,18 @@ def read_orthogroups_info(OrthoPath, PathToDESwoMAN, SpeciesList):
 
     return CodingDict
 
-def get_acceptable_noncoding_homologs(PathToDESwoMAN, CodingDict, SpeciesList):
-    #Filter the DESwoMAN output for mutations that are acceptable
+def get_acceptable_noncoding_homologs(PathToDESwoMAN:str, CodingDict:dict, SpeciesList:str)->tuple[dict,dict]:
+    """
+    Make a dictionary with all coding homologs
+
+    Parameters: 
+    -PathToDESwoMAN(str): Path to the DESwoMAN folder
+    -CodingDict (dict): Dictionary with the neORFs
+    -SpeciesList: File with all species (.txts)
+
+    Returns:
+    -tuple[dict,dict]: Dictionary of coding homologs (updated), Accepted noncoding homologs (= with mutation)
+    """
     x = get_populations(SpeciesList)
     validated_count = 0
     unvalidated_count = 0
@@ -134,8 +186,17 @@ def get_acceptable_noncoding_homologs(PathToDESwoMAN, CodingDict, SpeciesList):
   
     return AcceptedHomologs, CodingDict
 
-def generateBlastInput(PathToDESwoMAN, SpeciesList):
-    #Merge all fasta files of neORFs together to create 
+def generateBlastInput(PathToDESwoMAN:str, SpeciesList:list)->list:
+    """
+    Generates the input file for Blast (i.e. all neORFs merged in one file)
+
+    Parameters: 
+    -PathToDESwoMAN(str): Path to the DESwoMAN folder
+    -SpeciesList: File with all species (.txts)
+
+    Returns:
+    -list: List of ORFs
+    """
     x = get_populations(SpeciesList)
     ORF_list = []
     BlastFile = open("neORFs_Nuc_all.fa", "w")
@@ -147,12 +208,32 @@ def generateBlastInput(PathToDESwoMAN, SpeciesList):
     BlastFile.close()
     return ORF_list
 
-def run_blast_te(PathToTE, Coverage, Evalue, Identity, Strand):
-    #Run blast against a database
+def run_blast_te(PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str):
+    """
+    Generates the input file for Blast (i.e. all neORFs merged in one file)
+
+    Parameters: 
+    -PathToTE (str): Path to the TE database 
+    -Coverage (float): Qcovhsp for blast
+    -Evalue(float): Evalue threshold for blast
+    -Identity (float): Percent identity for blast
+    -Strand (str): Search forward only/reverse/both?
+
+    Returns:
+    -Nothing
+    """
     subprocess.call(f'blastn -query neORFs_Nuc_all.fa -subject {PathToTE} -perc_identity {Identity} -qcov_hsp_perc {Coverage} -strand {Strand} -evalue {Evalue} -outfmt "6 qseqid sseqid evalue" -out Blast_out', shell = True) 
 
-def get_TE_neORFs(ORF_list):
-    #Read  the blast output and give a list with all that have no hit
+def get_TE_neORFs(ORF_list:list)->tuple[list,list]:
+    """
+    Get the hits and no hits from the blast output
+
+    Parameters: 
+    -ORF_list: List with all ORFs
+
+    Returns:
+    -tuple[list,list]: Two lists (one with hits one with no hits)
+    """
     HitList = []
     BlastOut = open("Blast_out","r")
     for line in BlastOut:
@@ -164,8 +245,23 @@ def get_TE_neORFs(ORF_list):
     print(f"Percentage excluded due to Sequence overlap:{PercentageExcluded} %\nNumber kept:{len(NoHit)}\nNumber removed:{len(set(HitList))}")
     return list(NoHit), list(set(HitList))
 
-def run_blast_operation(PathToDESwoMAN, PathToTE, Coverage, Evalue, Identity, Strand, SpeciesList):
-    #This function merges all blast related tasks
+def run_blast_operation(PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, SpeciesList:str)->tuple[list,list]:
+    """
+    Function for the complete blast workflow. 
+
+    Parameters: 
+    -PathToDESwoMAN (str): Path to the DESwoMAN folder
+    -PathToTE (str): Path to the TE database 
+    -Coverage (float): Qcovhsp for blast
+    -Evalue(float): Evalue threshold for blast
+    -Identity (float): Percent identity for blast
+    -Strand (str): Search forward only/reverse/both?
+    -SpeciesList(str): Path to the Species File
+
+
+    Returns:
+    -tuple[list,list]: Two lists (one with hits one with no hits)
+    """
     ORF_list =  generateBlastInput(PathToDESwoMAN, SpeciesList)
     run_blast_te(PathToTE, Coverage, Evalue, Identity, Strand)
     NoHit, Hit = get_TE_neORFs(ORF_list)
@@ -173,16 +269,36 @@ def run_blast_operation(PathToDESwoMAN, PathToTE, Coverage, Evalue, Identity, St
     os.remove("neORFs_Nuc_all.fa")
     return NoHit, Hit
 
-def compare2lists(list1, list2):
-    #Comoare two lists. If any item from list1 is in list2 it returns True.
+def compare2lists(list1:list, list2:list)->bool:
+    """
+    Compare two lists. If any item from list1 is in list2 it returns True.
+
+    Parameters: 
+    -list1 (list)
+    -list2(list)
+
+    Returns:
+    -bool: True or False
+    """
     for item in list1:
         if item in list2:
             return True
     return False
 
-def get_save_neORF(CodingDict, NoncodingDict, TEHitList, Tree):
-    #Filter ORFs based on whether they have a noncoding homolog in synteny and have no hit in a Drosophlia TE database.
-    
+def get_save_neORF(CodingDict:dict, NoncodingDict:dict, TEHitList:list, Tree:str)->list:
+    """
+    Compare two lists. If any item from list1 is in list2 it returns True.
+
+    Parameters: 
+    -CodingDict(dict): Coding neORFs
+    -NoncodingDict(dict): Noncoding homologs
+    -TEHitList(list): List of neORFs with a TE match
+    -Tree(str): Path to the newick folder
+
+    Returns:
+    -list: A list of validated homologs
+    """
+
     Validated, ToRemove, ValidSpecies, AllSpecies = [], [], [], []
 
     for neORF in CodingDict:
@@ -214,21 +330,33 @@ def get_save_neORF(CodingDict, NoncodingDict, TEHitList, Tree):
     PercentageValid = round((len(Validated)/(len(Validated)+ len(ToRemove)))*100, 2)
     print(f"Percentage of valid neORF:{PercentageValid} %\nNumber of safe validated neORFs:{len(Validated)}\nNumber of potentially non de novo neORF:{len(ToRemove)}")
     
-    #Count the percentage of neORFs retained in each species
-    #DmelPerc = (ValidSpecies.count("Dmel")/AllSpecies.count("Dmel"))*100
-    #DsimPerc = (ValidSpecies.count("Dsim")/AllSpecies.count("Dsim"))*100
-    #DsuzPerc = (ValidSpecies.count("Dsuz")/AllSpecies.count("Dsuz"))*100
-    #DanaPerc = (ValidSpecies.count("Dana")/AllSpecies.count("Dana"))*100
-    #DsubPerc = (ValidSpecies.count("Dsub")/AllSpecies.count("Dsub"))*100
-    #DimmPerc = (ValidSpecies.count("Dimm")/AllSpecies.count("Dimm"))*100
-    
-    #print(f"#####################\nPercentages of neORF retained after filtering (per Species):\nDmel:{round(DmelPerc,2)} %\nDsim:{round(DsimPerc,2)} %\nDsuz:{round(DsuzPerc,2)} %\nDana:{round(DanaPerc,2)} %\nDsub:{round(DsubPerc,2)} %\nDimm:{round(DimmPerc,2)} %")
-
     return Validated
 
 
-def filter_neORFs(Orthopath, PathToDESwoMAN, PathToTE, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,Te_check, rna_check, Tree, SpeciesList):
-    #This runs the whole filtering analysis
+def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, PathToTr:str, CoverageTr:float, EvalueTr:float, IdentityTr:float,Te_check:bool, rna_check:bool, Tree:str, SpeciesList:str)->list:
+    """
+    Run the whole filtering analysis:
+
+    Parameters: 
+    -Orthopath (str): Path to the Orthofinder outputfile
+    -PathToDESwoMAN (str): Path to the DESwoMAN output 
+    - PathToTE (str): Path to the TE database 
+    -Coverage (float): Coverage for TE blast 
+    - Evalue (float): Evalue for TE blast
+    -Identity (float): Percent identity for TE blast
+    -Strand (str): Strand for TE blast
+    -PathToTr (str): Path to transcript database (e.g. ncrna)
+    -CoverageTr(float): Coverage for nuc blast
+    -EvalueTr(float): Evalue for nuc blast
+    IdentityTr(float): Percent identity for nuc blast
+    -Te_check (bool): Filter TE
+    -rna_check (bool): Filter nucleotides e.g. RNA
+    -Tree (str): Path to  the newick file
+    -SpeciesList (str): File with Species info
+
+    Returns:
+    -list: A list of validated homologs
+    """
     print("#####################\nFiltering the neORFs detected with DESwoMAN.\n#####################")
     CodingHomologs = read_orthogroups_info(Orthopath, PathToDESwoMAN, SpeciesList)
     SpeciesWithHomologs, CodingHomologs = get_acceptable_noncoding_homologs(PathToDESwoMAN, CodingHomologs,SpeciesList)
@@ -257,9 +385,19 @@ def filter_neORFs(Orthopath, PathToDESwoMAN, PathToTE, Coverage, Evalue, Identit
     Validated = get_save_neORF(CodingHomologs, SpeciesWithHomologs, NoHit, Tree)
     return Validated
 
-def create_output(PathToDESwoMAN, Valid_neORFs, Outpath, SpeciesList):
-    #Redo all the DESwoMAN output files but now only with the accepted neORFs
+def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesList:str):
+    """
+    Redo all the DESwoMAN output files but now only with the accepted neORFs
 
+    Parameters: 
+    -PathToDESwoMAN (str): Path to the DESwoMAN output 
+    - Valid_neORFs (list): List of accepted de novo ORFs
+    -Outpath: Name of the output file
+    -SpeciesList (str): File with Species info
+
+    Returns:
+    -Nothing
+    """
     Valid_Transcripts = []
     for i in Valid_neORFs:
         Valid_Transcripts.append(i.split("_")[0]+ "_" + i.split("_")[-1])
