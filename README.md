@@ -1,32 +1,10 @@
-# Useful scripts for bioinformatic tasks
-Here are some scripts I wrote for tasks I needed to run multiple times.
+# deswomanUTIL
+Some scripts to deal with the DESwoMAN output.
 
 > [!IMPORTANT]
 > This script has not been extensively tested so use at your own risk and double check the results. 
 
-## 1) check_rnaseq_data.py
-This script uses [RSeQC](https://doi.org/10.1093/bioinformatics/bts356) to determine whether a set of RNAseq data is stranded.
-
-## 2) Fai_converter.py
-Convert a genome index file (.fai) to a chromosome length bed3file (ChromName 0 Chrom Length).
-
-- `--inp` Path to the index file including the filename (e.g. /home/user/Genome.fa.fai)
-- `--out` Path to the output file including the filename (e.g. /home/user/Genome.bed) - _optional_
-
-__Usage:__
-```python3 Fai_converter.py -in PathToGenome.fai -out PathToOutput.bed (default = PathToGenome_ChromLengths.bed)```
-
-## 3) gff2bed.py
-Transform a gff/gtf file to a bedfile (bed6). 
-
-- `--inp` Path to the gtf/gff file including the filename (e.g. /home/user/genes.gff)
-- `--out` Path to the output file excluding the filename (e.g. /home/user/genes)
-- `--type` Type (e.g. gene, transcript, mRNA, ...) to be included in the bedfile (only 1 possible)  - _optional, default: mRNA_
-
- __Usage:__
-```python3 gff2bed.py --inp GFFFile (--out Outname (no suffix)) (--type Type (e.g. gene/mRNA/transcript, ...))```
-
-## 4) filterDESwoMAN.py
+## 1) filterDESwoMAN.py
 Filter the output of [DESwoMAN](https://github.com/AnnaGrBio/DESWOMAN) to get a dataset of high confidence _de novo_ originated neORFs.
 It is important that you did the following steps before running:
 1) You ran DESwoMAN on one or multiple species. The output for each species needs to be in a separate folder with the full name (e.g. DmelZI or DsubFAL). This is also true when you only ran it for one species!
