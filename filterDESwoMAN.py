@@ -9,15 +9,16 @@ from io import StringIO
 
 """
 GET A SUBSET OF HIGH CONFIDENCE DE NOVO ORFs
-This script filters the DESwoMAN output based on the following phylogeny
+This script filters the DESwoMAN output based on the noncoding homologs and a phylogeny
 Author: Marie
 Date: 16.05.25
 Edited: 04.08.25
 
 How to run:
-usage: python3 FilterORFsForDeNovoOrigin.py [-h] [--te_db TE_DB] [--te_cov TE_COV] [--te_idt TE_IDT] [--te_eval TE_EVAL] [--ortho ORTHO] [--deswoman DESWOMAN] [--rna_check]
-                                    [--te_check] [--tr_db TR_DB] [--tr_cov TR_COV] [--tr_idt TR_IDT] [--tr_eval TR_EVAL] [--tr_strand TR_STRAND] [--out OUT]
-                                    [--tree TREE] [--species_file SPECIES_FILE]
+usage: filterDESwoMAN.py [-h] [--te_db TE_DB] [--te_cov TE_COV] [--te_idt TE_IDT] [--te_eval TE_EVAL] [--ortho ORTHO] [--deswoman DESWOMAN] [--rna_check] [--te_check]
+                         [--tr_db TR_DB] [--tr_cov TR_COV] [--tr_idt TR_IDT] [--tr_eval TR_EVAL] [--tr_strand TR_STRAND] [--out OUT] [--tree TREE]
+                         [--species_file SPECIES_FILE] [--accepted_mutations ACCEPTED_MUTATIONS] [--frameshift_score FRAMESHIFT_SCORE]
+
 
 CRITERIA FOR FILTERING:
 
@@ -134,14 +135,16 @@ def read_orthogroups_info(OrthoPath:str, PathToDESwoMAN:str, SpeciesList:str)->d
 
     return CodingDict
 
-def get_acceptable_noncoding_homologs(PathToDESwoMAN:str, CodingDict:dict, SpeciesList:str)->tuple[dict,dict]:
+def get_acceptable_noncoding_homologs(PathToDESwoMAN:str, CodingDict:dict, SpeciesList:str, mutations:list, frame:float)->tuple[dict,dict]:
     """
     Make a dictionary with all coding homologs
 
     Parameters: 
     -PathToDESwoMAN(str): Path to the DESwoMAN folder
     -CodingDict (dict): Dictionary with the neORFs
-    -SpeciesList: File with all species (.txts)
+    -SpeciesList (str): File with all species (.txts)
+    -mutations (list): List with all accepted mutations
+    -frame (float): Maximum percentage of the sequence not affected by frameshift to still count as noncoding
 
     Returns:
     -tuple[dict,dict]: Dictionary of coding homologs (updated), Accepted noncoding homologs (= with mutation)
@@ -159,8 +162,17 @@ def get_acceptable_noncoding_homologs(PathToDESwoMAN:str, CodingDict:dict, Speci
             l = li.strip().split(",")
             neORFID, TargetSpecies = f"{l[0]}_{line}", l[1][0:4]
             start, stop, Indels,perc_seq_not_affected_by_frameshift, substitutions, premature_stop, transcription_status = l[4], l[5], l[6], l[7], l[8], l[9], l[11]
+
+            #Really comblicated way deal with each mutation
+            startcheck = "P" if "start" in mutations else "placeholder"
+            stopcheck = "P" if "stop" in mutations else "placeholder"
+            premature_stopcheck = "A" if "premature_stop" in mutations else "placeholder"
+            completecheck = "complete" if "complete" in mutations else "placeholder"
+            partialcheck = "partial" if "partial" in mutations else "placeholder"
+            antisensecheck = "reverse" if "reverse" in mutations else "placeholder"
+
             if l[2] == "P" and start != "NA": #Only include present homologs. 
-                if start != "P" or stop != "P"  or premature_stop != "A" or float(perc_seq_not_affected_by_frameshift) < 60 or (transcription_status != "complete" and transcription_status != "partial"):#transcription_status != "complete": #Change here (!)
+                if start != startcheck or stop != stopcheck  or premature_stop != premature_stopcheck or float(perc_seq_not_affected_by_frameshift) <= frame or (transcription_status != completecheck and transcription_status !=partialcheck and transcription_status !=antisensecheck):#transcription_status != "complete": #Change here (!)
                 #if start != "P" or stop != "P"  or premature_stop != "A" or int(Indels) > 0 or transcription_status != "complete":
                     #Check if any mutation is suggesting that the homolog is non coding
                     validated_count += 1
@@ -333,16 +345,16 @@ def get_save_neORF(CodingDict:dict, NoncodingDict:dict, TEHitList:list, Tree:str
     return Validated
 
 
-def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, PathToTr:str, CoverageTr:float, EvalueTr:float, IdentityTr:float,Te_check:bool, rna_check:bool, Tree:str, SpeciesList:str)->list:
+def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, PathToTr:str, CoverageTr:float, EvalueTr:float, IdentityTr:float,Te_check:bool, rna_check:bool, Tree:str, SpeciesList:str, mutations:list, frame:float)->list:
     """
     Run the whole filtering analysis:
 
     Parameters: 
     -Orthopath (str): Path to the Orthofinder outputfile
     -PathToDESwoMAN (str): Path to the DESwoMAN output 
-    - PathToTE (str): Path to the TE database 
+    -PathToTE (str): Path to the TE database 
     -Coverage (float): Coverage for TE blast 
-    - Evalue (float): Evalue for TE blast
+    -Evalue (float): Evalue for TE blast
     -Identity (float): Percent identity for TE blast
     -Strand (str): Strand for TE blast
     -PathToTr (str): Path to transcript database (e.g. ncrna)
@@ -353,13 +365,15 @@ def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:floa
     -rna_check (bool): Filter nucleotides e.g. RNA
     -Tree (str): Path to  the newick file
     -SpeciesList (str): File with Species info
+    -mutations (list): list with accepted mutations
+    -frame (float): Maximum percentage of the sequence not affected by frameshift to still count as noncoding
 
     Returns:
     -list: A list of validated homologs
     """
     print("#####################\nFiltering the neORFs detected with DESwoMAN.\n#####################")
     CodingHomologs = read_orthogroups_info(Orthopath, PathToDESwoMAN, SpeciesList)
-    SpeciesWithHomologs, CodingHomologs = get_acceptable_noncoding_homologs(PathToDESwoMAN, CodingHomologs,SpeciesList)
+    SpeciesWithHomologs, CodingHomologs = get_acceptable_noncoding_homologs(PathToDESwoMAN, CodingHomologs,SpeciesList, mutations, frame)
     if Te_check:
         print("#####################\nStarting the TE filter:")
         NoHit1, Hit1 = run_blast_operation(PathToDESwoMAN, PathToTE, Coverage, Evalue, Identity, "both", SpeciesList)
@@ -491,6 +505,11 @@ if __name__ == "__main__":
     parser.add_argument("--out", help="Name of the output folder (Default: FilteredNeORFs)", type=str, default="FilteredNeORFs")
     parser.add_argument("--tree", help="Newick tree file; needs all internal nodes", type=str)
     parser.add_argument("--species_file", help="Text file with all species", type=str)
+    #Add mutations as argument
+    parser.add_argument("--accepted_mutations", help="List all mutations to be accepted as noncoding", type=str, default="complete,start,stop,premature-stop,frameshift")
+    parser.add_argument("--frameshift_score", help="Frameshift_score to be accepted as enough to deem a sequence noncoding.", type=float, default=50)
+    
+
     print("-------------------------\nFilter neORFs\nV.1.0\nAuthor:Marie Lebherz\n-------------------------\n")
 
     #Read the input    
@@ -512,6 +531,10 @@ if __name__ == "__main__":
     Tree = args.tree
     SpeciesList = args.species_file
 
+    #mutations
+    muts = args.accepted_mutations
+    mutations = muts.split(",")
+    frame = args.frameshift_score
     
     #Check if all is correct
     if not DESwoMANPath:
@@ -525,9 +548,14 @@ if __name__ == "__main__":
         print("You did not supply an Orthogroup File. All neORFs are treated as if they have no detected coding Homologs.")
     #Start running the analysis
     print("Starting the analysis!\n\n")
-    Valid_neORFs = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList)     
+    Valid_neORFs = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList, mutations, frame)     
     create_output(DESwoMANPath, Valid_neORFs, Outpath, SpeciesList)
     print("\nFinished!")
     print("Goodybe ;)")
 
- #python3 GetHighConfidenceNeORFs.py --te_db /global/scratch2/m_lebh01/TranscriptModelling/ReferenceNCBI/TE_DatabaseFlybase/FyBase_TE.fa --ortho Orthofinder/OrthoFinder/Results_May19/Orthogroups/Orthogroups.txt --deswoman ./
+#Mutations available:
+#-Start: present or absent
+#-Stop: present or absent
+#- Frameshift > Score (num)
+#- Premature Stop: present or absent
+#- Transcription: present, incomplete, antisense or absent
