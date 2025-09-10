@@ -29,4 +29,15 @@ It is important that you did the following steps before running:
 - `--species_file` Text file with all samples listed (one per line, str)
 
 __Usage:__
+```python3 getGFFfromOut.py [-h] --deswoman PATH/TO/DESWOMAN/info_file.txt --gtf Path/To/GTF --outname Path/To/OUTNAME```
+
+## 2) getGFFfromOut.py
+Generate a gff file with all neORF candidates from the DESwoMAN info file. 
+
+- `--deswoman` Path to the deswoman information file
+- `--gtf` Path to the corresponding transcriptome assembly (gtf)
+- `--outname` Name of the output file (default: DESwoMAN)
+
+
+__Usage:__
 ```python3 filterDESwoMAN.py --te_db Database.fa --ortho Orthofinder/OrthoFinder/Results/Orthogroups.txt --deswoman ./ --out FilteredResults```
