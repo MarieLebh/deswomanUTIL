@@ -361,7 +361,7 @@ def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:floa
     -PathToTr (str): Path to transcript database (e.g. ncrna)
     -CoverageTr(float): Coverage for nuc blast
     -EvalueTr(float): Evalue for nuc blast
-    IdentityTr(float): Percent identity for nuc blast
+    -IdentityTr(float): Percent identity for nuc blast
     -Te_check (bool): Filter TE
     -rna_check (bool): Filter nucleotides e.g. RNA
     -Tree (str): Path to  the newick file
