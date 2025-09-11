@@ -6,6 +6,10 @@ import os
 
 """
 GENERATE AN OUTPUT GFF WITH ALL DESwoMAN NeORFs
+Get a gff file with neORFs and information.
+Author: Marie
+Date: 10.09.2025
+Edited: 11.09.2025
 
 usage: getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME]
 
@@ -160,7 +164,7 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
     for key in SaveDict:
         for item in SaveDict[key]:
             Out.write(item)
-            
+
     #Close everything again
     DESWOMAN.close()
     GTFfile.close()

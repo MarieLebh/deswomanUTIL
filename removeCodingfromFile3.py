@@ -1,7 +1,20 @@
 #!/usr/bin/python3
+
 import argparse
 import sys
 import os
+
+"""
+REMOVE CODING HOMOLOGS FROM THE STEP3 OUTPUT FILE
+This script filters the DESwoMAN output to remove "noncoding" homologs based on additional orthofinder runs. Specifically the format needs to be like the "Orthofinder.txt" format
+Author: Marie
+Date: 16.05.25
+Edited: 11.09.25
+
+usage: removeCodingfromFile3.py [-h] [--ortho ORTHO] [--deswoman DESWOMAN] [--query_file QUERY_FILE]
+"""
+
+
 def get_populations(File:str)-> list:
     """
     Read in a text file with one population/id on each line

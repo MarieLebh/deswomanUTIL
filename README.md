@@ -31,7 +31,8 @@ It is important that you did the following steps before running:
 - `--frameshift_score` Maximum percent of frame conservation above which it will be considered coding
 
 __Usage:__
-```python3 filterDESwoMAN.py --te_db Database.fa --ortho Orthofinder/OrthoFinder/Results/Orthogroups.txt --deswoman ./ --out FilteredResults```
+```filterDESwoMAN.py [-h] [--te_db TE_DB] [--te_cov TE_COV] [--te_idt TE_IDT] [--te_eval TE_EVAL] [--ortho ORTHO] [--deswoman DESWOMAN] [--rna_check][--te_check] [--tr_db TR_DB] [--tr_cov TR_COV] [--tr_idt TR_IDT] [--tr_eval TR_EVAL] [--tr_strand TR_STRAND] [--out OUT][--tree TREE] [--species_file SPECIES_FILE] [--accepted_mutations ACCEPTED_MUTATIONS] [--frameshift_score FRAMESHIFT_SCORE]```
+
 
 
 ## 2) getGFFfromOut.py
@@ -43,3 +44,14 @@ Generate a gff file with all neORF candidates from the DESwoMAN info file.
 
 __Usage:__
 ```python3 getGFFfromOut.py [-h] --deswoman PATH/TO/DESWOMAN/info_file.txt --gtf Path/To/GTF --outname Path/To/OUTNAME```
+
+
+## 3) removeCodingfromFile3.py
+Remove noncoding homologs that have an expressed homolog via [OrthoFinder](https://github.com/davidemms/OrthoFinder).
+
+- `--deswoman` Path to the deswoman folder (NOT: info file!)
+- `--ortho` Path to the orthofinder ["orthogropus.txt" file](https://github.com/davidemms/OrthoFinder?tab=readme-ov-file#orthogroups-directory-deprecated) (Needs to be this format!)
+- `--query_file` File with the name of all querys for which to do this analysis. Important: Each need to have a folder with the query name and DESwoMAN output in the working directory. 
+
+__Usage:__
+```removeCodingfromFile3.py [-h] [--ortho ORTHO] [--deswoman DESWOMAN] [--query_file QUERY_FILE]```
