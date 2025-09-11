@@ -5,6 +5,11 @@ Some scripts to deal with the DESwoMAN output.
 > This script has not been extensively tested so use at your own risk and double check the results. 
 
 ## 1) filterDESwoMAN.py
+
+> [!IMPORTANT]
+> This script allows some flexibility in deciding which mutations are considered to deem a homolog "noncoding".
+> It is important to state that some are likely more disrupting than others e.g. a frameshift mutation or a premature stop early in the sequence (-> frame conservation score) likely disrupt the noncoding sequence more than a missing start (-> sequence might still be translated due to a non canonical start codon). Missing transcription is also biased by the RNAseq data used and should therefore be treated with caution. 
+
 Filter the output of [DESwoMAN](https://github.com/AnnaGrBio/DESWOMAN) to get a dataset of high confidence _de novo_ originated neORFs.
 It is important that you did the following steps before running:
 1) You ran DESwoMAN on one or multiple species. The output for each species needs to be in a separate folder with the full name (e.g. DmelZI or DsubFAL). This is also true when you only ran it for one species!
