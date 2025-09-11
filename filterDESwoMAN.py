@@ -57,7 +57,7 @@ def find_common_node(newick:str, species_list:list)->str:
     -list: list of lines
     """
     tree = Phylo.read(newick, "newick")
-    # Normalize species names (remove dots if needed, optional depending on your data)
+    # Normalize species names 
     species_list = [s.replace(" ", "").strip() for s in species_list]
     # Find the MRCA
     mrca = tree.common_ancestor(species_list)
@@ -112,7 +112,7 @@ def read_orthogroups_info(OrthoPath:str, PathToDESwoMAN:str, SpeciesList:str)->d
             Prots =  SeqIO.to_dict(SeqIO.parse(f"{PathToDESwoMAN}/{line}/denovo_protein.fa", "fasta"))
             for key in Prots:
                 CodingDict[key+"_" + line] = [line[:4]]
-     
+
     else:
         Orthogroups = {}
         Info = open(OrthoPath, "r")
