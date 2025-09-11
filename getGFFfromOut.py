@@ -1,12 +1,9 @@
-from Bio import SeqIO
-import os
-import subprocess
-from collections import Counter
+#!/usr/bin/python3
+
 import argparse
 import sys
-from Bio import Phylo
-from io import StringIO
-###FIX THE WEIRD GFF ISSUE
+import os
+
 """
 GENERATE AN OUTPUT GFF WITH ALL DESwoMAN NeORFs
 
@@ -163,6 +160,11 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
     for key in SaveDict:
         for item in SaveDict[key]:
             Out.write(item)
+            
+    #Close everything again
+    DESWOMAN.close()
+    GTFfile.close()
+    Out.close()
 
 #Test paths
 #DESwoMAN = "/global/students/research/m_lebh01/DESwoMAN/FinalTestDESwoMAN/MarieCorrections/genomes_strat1/DESwoMAN_denovo_output/information_file.txt"
