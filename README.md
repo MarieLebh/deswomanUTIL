@@ -63,3 +63,16 @@ Remove noncoding homologs that have an expressed homolog via [OrthoFinder](https
 
 __Usage:__
 ```removeCodingfromFile3.py [-h] [--ortho ORTHO] [--deswoman DESWOMAN] [--query_file QUERY_FILE]```
+
+
+## 4) checkTEcontent.py
+Get a fast overview of the neORFs TE content using a TE library
+
+- `--NeORF` Path to the neORF fasta file (nucleotide)
+- `--TE_db` Path to the TE database (fasta file)
+- `--cov` Blast coverage for TE search (float, default = 80)
+- `--perc_ident` Percent identity for TE search (float, default = 80)
+- `--evalue` Evalue for TE search (float, default = 0.001)
+
+__Usage:__
+```checkTEcontent.py [-h] [--NeORF NEORF] [--TE_db TE_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV]```
