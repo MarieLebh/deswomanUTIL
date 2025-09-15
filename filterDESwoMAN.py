@@ -383,7 +383,6 @@ def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:floa
         NoHit1, Hit1 = [], []
     if rna_check:
         print("#####################\nStarting the RNA filter:")
-        print("Hi")
         NoHit2, Hit2 = run_blast_operation(PathToDESwoMAN, PathToTr, CoverageTr, EvalueTr, IdentityTr, Strand, SpeciesList)
         print("#####################") 
     else:
