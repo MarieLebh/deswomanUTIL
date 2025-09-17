@@ -164,17 +164,27 @@ def get_acceptable_noncoding_homologs(PathToDESwoMAN:str, CodingDict:dict, Speci
             neORFID, TargetSpecies = f"{l[0]}_{line}", l[1][0:4]
             start, stop, Indels,perc_seq_not_affected_by_frameshift, substitutions, premature_stop, transcription_status = l[4], l[5], l[6], l[7], l[8], l[9], l[11]
 
-            #Really comblicated way deal with each mutation
-            startcheck = "P" if "start" in mutations else "placeholder"
-            stopcheck = "P" if "stop" in mutations else "placeholder"
-            premature_stopcheck = "A" if "premature_stop" in mutations else "placeholder"
-            completecheck = "complete" if "complete" in mutations else "placeholder"
-            partialcheck = "partial" if "partial" in mutations else "placeholder"
-            antisensecheck = "reverse" if "reverse" in mutations else "placeholder"
-
+            #Really complicated way deal with each mutation
+            checks = []
+            if "start" in mutations:
+                checks.append(start == "P")
+            if "stop" in mutations:
+                checks.append(stop == "P")
+            if "premature_stop" in mutations:
+                checks.append(premature_stop == "A")
+            if "complete" in mutations:
+                checks.append(transcription_status == "complete" or transcription_status == "NA")
+            if "partial" in mutations:
+                checks.append(transcription_status == "partial" or transcription_status == "NA")
+            if "reverse" in mutations:
+                checks.append(transcription_status == "reverse" or transcription_status == "NA")
+            if "frameshift" in mutations:
+                if perc_seq_not_affected_by_frameshift == "NA":
+                    checks.append(False) #Just a placeholder so no error occurs, the line will be skipped due to start !=NA
+                else:
+                    checks.append(float(perc_seq_not_affected_by_frameshift) < frame)
             if l[2] == "P" and start != "NA": #Only include present homologs. 
-                if start != startcheck or stop != stopcheck  or premature_stop != premature_stopcheck or float(perc_seq_not_affected_by_frameshift) <= frame or (transcription_status != completecheck and transcription_status !=partialcheck and transcription_status !=antisensecheck):#transcription_status != "complete": #Change here (!)
-                #if start != "P" or stop != "P"  or premature_stop != "A" or int(Indels) > 0 or transcription_status != "complete":
+                if not all(checks):
                     #Check if any mutation is suggesting that the homolog is non coding
                     validated_count += 1
                     if neORFID in AcceptedHomologs:
@@ -326,12 +336,10 @@ def get_save_neORF(CodingDict:dict, NoncodingDict:dict, TEHitList:list, Tree:str
         NodeCoding = find_common_node(Tree, Coding_Homologs) #Check the node in the tree
         List_Accepted_Homologs = get_outgroup_from_clade_name(Tree, NodeCoding)#Get the accepted homologs for that node
         index = 0
-
         #Modify the result so its the species names and NOT the population names
         for elem in List_Accepted_Homologs:
             List_Accepted_Homologs[index] = elem[:4]
             index +=1
-        
 
         if compare2lists(List_Accepted_Homologs, NoncodingHomologs): #check if any of them is present
             Validated.append(neORF)
@@ -416,6 +424,11 @@ def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesLis
     for i in Valid_neORFs:
         Valid_Transcripts.append(i.split("_")[0]+ "_" + i.split("_")[-1])
 
+    if not Valid_neORFs:
+        print("\n[Warning:]\nNo neORFs could be validated as de novo with your specifications. Please check your data or try other parameters.")
+        print("[Note:]\nYour output will not be filtered as there is nothing to filter out. Exiting...")
+        sys.exit()
+
     subprocess.call(f"mkdir {Outpath}", shell = True)
 
     x = get_populations(SpeciesList)
@@ -482,12 +495,16 @@ def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesLis
                 NewHomolog.write(li)
         NewHomolog.close()
 
+def main():
+    """
+    The main function to run the program
 
-#Give the option to choose which enabling mutations to include and what threshold
-        
-if __name__ == "__main__":
+    Parameters: 
+    None (need to be parsed to the commandline)
 
-    #Initialize all arguments
+    Returns:
+    Nothing
+    """
     parser = argparse.ArgumentParser(description="Get high confidence neORFs from the DESwoMAN output",epilog="-------------------------")
     parser.add_argument("--te_db", help="Path to theTE database", type=str)
     parser.add_argument("--te_cov", help="Coverage Blast against TE (Default = 80)", type=float, default= 80)
@@ -551,11 +568,7 @@ if __name__ == "__main__":
     Valid_neORFs = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList, mutations, frame)     
     create_output(DESwoMANPath, Valid_neORFs, Outpath, SpeciesList)
     print("\nFinished!")
-    print("Goodybe ;)")
+    print("Goodybe ;)")     
 
-#Mutations available:
-#-Start: present or absent
-#-Stop: present or absent
-#- Frameshift > Score (num)
-#- Premature Stop: present or absent
-#- Transcription: present, incomplete, antisense or absent
+if __name__ == "__main__":
+    main()
