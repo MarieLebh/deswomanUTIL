@@ -3,6 +3,7 @@ Some scripts to deal with the DESwoMAN output.
 
 > [!IMPORTANT]
 > This script has not been extensively tested so use at your own risk and double check the results. 
+> For most scripts the input needs to be formatted in a specific way. Make sure to check the [Test dataset](https://github.com/MarieLebh/deswomanUTIL/tree/main/Test) to see how to structure your data. 
 
 ## 1) filterDESwoMAN.py
 
