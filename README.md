@@ -53,19 +53,29 @@ Generate a gff file with all neORF candidates from the DESwoMAN info file.
 __Usage:__
 ```python3 getGFFfromOut.py [-h] --deswoman PATH/TO/DESWOMAN/info_file.txt --gtf Path/To/GTF --outname Path/To/OUTNAME```
 
+## 3) runOrthofinder.py
+Prepares your input for [OrthoFinder](https://github.com/davidemms/OrthoFinder) and then runs it with a given number of threads.
 
-## 3) removeCodingfromFile3.py
+- `--create_folder` Only create the orthofinder input files/folder and exit. Do not run Orthofinder.
+- `--deswoman` Path to the deswoman folder (NOT: info file!)
+- `--species_file` File with the name of all querys for which to do this analysis. Important: Each need to have a folder with the query name and DESwoMAN output in the working directory. 
+- `--threads` Number of threads for the Orthofinder run. 
+
+__Usage:__
+```runOrthfinder.py [-h] [--threads THREADS] [--create_folder] [--species_file SPECIES_FILE] [--deswoman DESWOMAN]```
+
+## 4) removeCodingfromFile3.py
 Remove noncoding homologs that have an expressed homolog via [OrthoFinder](https://github.com/davidemms/OrthoFinder).
 
 - `--deswoman` Path to the deswoman folder (NOT: info file!)
 - `--ortho` Path to the orthofinder ["orthogropus.txt" file](https://github.com/davidemms/OrthoFinder?tab=readme-ov-file#orthogroups-directory-deprecated) (Needs to be this format!)
-- `--query_file` File with the name of all querys for which to do this analysis. Important: Each need to have a folder with the query name and DESwoMAN output in the working directory. 
+- `--species_file` File with the name of all querys for which to do this analysis. Important: Each need to have a folder with the query name and DESwoMAN output in the working directory. 
 
 __Usage:__
 ```removeCodingfromFile3.py [-h] [--ortho ORTHO] [--deswoman DESWOMAN] [--query_file QUERY_FILE]```
 
 
-## 4) checkTEcontent.py
+## 5) checkTEcontent.py
 Get a fast overview of the neORFs TE content using a TE library
 
 - `--NeORF` Path to the neORF fasta file (nucleotide)

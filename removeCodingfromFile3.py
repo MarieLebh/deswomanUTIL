@@ -119,7 +119,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Filter coding homologs from the final DESwoMAN output using Orthofinder Orthogroups containing both query and outgroup expressed ORFs.",epilog="-------------------------")
     parser.add_argument("--ortho", help="Path to the Orthogroups.txt file from OrthoFinder (e.g. /home/usr/orthofinder/orthogroups.txt)", type=str)
     parser.add_argument("--deswoman", help="Path to the DESwoMAN Outputs folder (e.g. /home/usr/deswoman/, Default = working directory)", type=str, default = "")
-    parser.add_argument("--query_file", help="Path to a text file where each query species is on one line.", type=str)
+    parser.add_argument("--soecies_file", help="Path to a text file where each query species is on one line.", type=str)
 
     print("-------------------------\nRemove noncoding homologs that have an expressed homolog via Orthofinder\nV.1.0\nAuthor:Marie Lebherz\n-------------------------\n")
 
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
     DESwoMANPath = args.deswoman
     OrthoPath = args.ortho
-    File = args.query_file
+    File = args.species_file
 
     if not DESwoMANPath or not OrthoPath or not DESwoMANPath:
         print("Filepath missing! Exiting...")
