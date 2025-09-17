@@ -34,6 +34,7 @@ def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
     Returns:
     - dict: dictionary with the CDS (stored as gff lines)
     """
+    #Open the GTF file of the transcrptome and save all exons in a list (for each transcript id)
     GTF = open(PathToTranscriptome , "r")
     Exons = {}
     for lin in GTF:
@@ -50,6 +51,7 @@ def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
     exon_dict = Exons
     GTF.close()
     
+    #Now open the DESwoMAN information file to get the necessary position information for each neORF
     InfoFile =  open(PathToDESwoMAN , "r")
     NeORFs = {}
     for li in InfoFile:        
@@ -59,12 +61,13 @@ def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
     InfoFile.close()
     orf_dict = NeORFs
 
+    #Initiate an empty dictionary and start getting the neORFs CDS coordinates
     FinalDict = {}
     for orfname, (transcript, orf_start, orf_end) in orf_dict.items():
         exon_list, strand, chrom = exon_dict[transcript]
-        # Build list of exons in order of transcription (not genome!)
+        # Build list of exons in order of transcription (+ vs -)
         if strand == "-":
-            exons = exon_list[::-1]  # reverse, so we're always moving 5'->3'
+            exons = exon_list[::-1]  # Minus strand so move in reverse order (5'->3')
         else:
             exons = exon_list
         transcript_pointer = 1  
@@ -75,7 +78,7 @@ def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
             exon_tr_start = transcript_pointer
             exon_tr_end = transcript_pointer + exon_len - 1
 
-            # Does the ORF overlap this exon?
+            # Check for overlap between neORF and the exon
             overlap_start = max(exon_tr_start, orf_start)
             overlap_end = min(exon_tr_end, orf_end)
 
@@ -87,28 +90,29 @@ def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
                     cds_genomic_start = exon_start + offset_start
                     cds_genomic_end = exon_start + offset_end
                 else:
-                    # on minus strand, exons are counted from the high coordinate down
+                    # On the minus strand, exons are counted from the high coordinate down
                     cds_genomic_end = exon_end - offset_start
                     cds_genomic_start = exon_end - offset_end
 
-                bed_start = min(cds_genomic_start, cds_genomic_end) - 1  
-                bed_end = max(cds_genomic_start, cds_genomic_end)       
-                bed_line = [
+                #Initiate the coordinates for the gff file  ad already format the correct gff line  
+                gff_start = min(cds_genomic_start, cds_genomic_end) - 1  
+                gff_end = max(cds_genomic_start, cds_genomic_end)       
+                gff_line = [
                     chrom,  
                     "deswomanUTIL",
                     "CDS",             
-                    str(bed_start+1),
-                    str(bed_end),
+                    str(gff_start+1),
+                    str(gff_end),
                     ".",
                     strand,
                     ".",
                     f'gene_id "{orfname.split("_")[0][:-2]}"; transcript_id "{orfname.split("_")[0]}"; neORF_id "{orfname}"'
                 ]
-
+                #Save the CDS gff formatted lines for the gff in a dictionary
                 if orfname.split("_")[0] in FinalDict:
-                    FinalDict[orfname.split("_")[0]]+= ["\t".join(bed_line)+"\n"]
+                    FinalDict[orfname.split("_")[0]]+= ["\t".join(gff_line)+"\n"]
                 else:
-                    FinalDict[orfname.split("_")[0]] = ["\t".join(bed_line)+"\n"]
+                    FinalDict[orfname.split("_")[0]] = ["\t".join(gff_line)+"\n"]
             transcript_pointer += exon_len
     return FinalDict
 
@@ -124,19 +128,21 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
     Returns:
     - nothing
     """
+    #Open all files/extract all information
     DESWOMAN = open(DESwoMAN, "r")
     GTFfile = open(GTF, "r")
     Out = open(Outname + ".gff", "w")
     Out.write(f"# deswomanUTIL -in {DESwoMAN} -gtf {GTF} \n# version 1\n")    
     CDS= extract_cds_bed(DESwoMAN, GTF)
 
+    #Initiate dictionary to save the results
     SaveDict = {}
 
+    #Now parse the DESwoMAN output file for information (all lines are saved as gff format lnes)
     DESWOMAN.readline()
     for line in DESWOMAN:
         l = line.split(",")
         SaveDict[l[5]] = [f'{l[1]}\tDESwoMAN\tneORF\t{int(l[-3])+1}\t{int(l[-2])+1}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
-
 
         if l[2] == "+":
             SaveDict[l[5]] += [f'{l[1]}\tdeswomanUTIL\tstart_codon\t{int(l[-3])+1}\t{int(l[-3])+4}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
@@ -149,7 +155,7 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
             SaveDict[l[5]] += [f'{l[1]}\tdeswomanUTIL\t5_prime_utr\t{int(l[11])+2}\t{int(l[7])}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
             SaveDict[l[5]] += [f'{l[1]}\tdeswomanUTIL\t3_prime_utr\t{int(l[6])}\t{int(l[10])}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
        
-
+    #Now parse the gtf file 
     for line in GTFfile:
         if line[0] != "#":
             l = line.split("\t")
@@ -157,10 +163,12 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
                 continue
             SaveDict[l[8].split(";")[1].split(" ")[2][1:-1]] += [f'{l[0]}\tStringtie\t{l[2]}\t{l[3]}\t{l[4]}\t{l[5]}\t{l[6]}\t.\tgene_id "{l[8].split(";")[0].split(" ")[1][1:-1]}"; transcript_id "{l[8].split(";")[1].split(" ")[2][1:-1]}";\n']
 
+    #Now parse the CDS dictionary
     for key in CDS:
         for value in CDS[key]:
             SaveDict[key] += value
 
+    #Now write all information to the output gff
     for key in SaveDict:
         for item in SaveDict[key]:
             Out.write(item)
@@ -199,8 +207,7 @@ if __name__ == "__main__":
         sys.exit()
 
     #Start running the analysis
-    print("Welcome to deswomanUTIL gff converter...\n")
+    print("Welcome to the deswomanUTIL gff converter...\n\nStarting the file transformation now!\n")
     generate_final_file(DESwoMANPath, GTF, Outname)
     print("Your file was successfully transformed!!")
     print("Goodybe ;)")
-

@@ -5,7 +5,8 @@ import sys
 import os
 import subprocess
 from Bio import SeqIO
-import statistics as stats
+import matplotlib.pyplot as plt
+
 """
 CHECK THE TE CONTENT OF NEORFS USING A TE LIBRARY
 Author: Marie
