@@ -183,8 +183,16 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
 #GTF = "/global/students/research/m_lebh01/DESwoMAN/FinalTestDESwoMAN/MarieCorrections/transcriptomes_strat1/AK5.gtf"
 #generate_final_file(DESwoMAN, GTF)
 
+def main():
+    """
+    Main function
 
-if __name__ == "__main__":
+    Parameter:
+    - none
+
+    Returns:
+    - Nothing
+    """
     #Initialize all arguments
     parser = argparse.ArgumentParser(description="Get high confidence neORFs from the DESwoMAN output",epilog="-------------------------")
     parser.add_argument("--deswoman", help="Path to the DESwoMAN info file", type=str)
@@ -211,3 +219,6 @@ if __name__ == "__main__":
     generate_final_file(DESwoMANPath, GTF, Outname)
     print("Your file was successfully transformed!!")
     print("Goodybe ;)")
+    
+if __name__ == "__main__":
+    main()

@@ -112,10 +112,16 @@ def filter_output(OrthoPath:str, PathDESwoMAN:str, File:str):
         print("Number kept (= no coding homolog in orthogroup with the neORF):", len(lines_to_keep))
         print("Number removed (= coding homologs in an orthogroup with the neORF):", len(lines_exclude), "\n")        
         
+def main():
+    """
+    The main function to run the program
 
+    Parameters: 
+    None (need to be parsed to the commandline)
 
-if __name__ == "__main__":
-
+    Returns:
+    Nothing
+    """
     parser = argparse.ArgumentParser(description="Filter coding homologs from the final DESwoMAN output using Orthofinder Orthogroups containing both query and outgroup expressed ORFs.",epilog="-------------------------")
     parser.add_argument("--ortho", help="Path to the Orthogroups.txt file from OrthoFinder (e.g. /home/usr/orthofinder/orthogroups.txt)", type=str)
     parser.add_argument("--deswoman", help="Path to the DESwoMAN Outputs folder (e.g. /home/usr/deswoman/, Default = working directory)", type=str, default = "")
@@ -138,3 +144,6 @@ if __name__ == "__main__":
 
     print("Finished!")
     print("Goodybe ;)")
+
+if __name__ == "__main__":
+    main()

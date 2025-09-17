@@ -133,13 +133,16 @@ def run_blast_te(PathToFasta:str, PathToTE:str, Coverage:float, Evalue:float, Id
     print("-------------------------------")
     os.remove("Blast_out")
 
-        
-# Example usage:
-#Query ="/global/students/research/m_lebh01/DESwoMAN/FinalTestDESwoMAN/MarieCorrections/genomes_strat1/AK5/denovo_nucl.fa"
-#TEDB = "/global/scratch2/m_lebh01/TranscriptModelling/ReferenceNCBI/TE_DatabaseFlybase/FlyBase_TE.fa" 
-#run_blast_te(Query,TEDB, 0,10,0)
+def main():
+    """
+    The main function to run the program
 
-if __name__ == "__main__":
+    Parameters: 
+    None (need to be parsed to the commandline)
+
+    Returns:
+    Nothing
+    """
     #Initialize all arguments
     parser = argparse.ArgumentParser(description="Get simple TE stats",epilog="-------------------------")
     parser.add_argument("--NeORF", help="Path to the NeORF fasta file", type=str)
@@ -170,3 +173,11 @@ if __name__ == "__main__":
     run_blast_te(NeORF, TE, Cov, Eval, Pident)
     print("Sucessfully generated simple TE stats.")
     print("Goodybe ;)")
+        
+# Example usage:
+#Query ="/global/students/research/m_lebh01/DESwoMAN/FinalTestDESwoMAN/MarieCorrections/genomes_strat1/AK5/denovo_nucl.fa"
+#TEDB = "/global/scratch2/m_lebh01/TranscriptModelling/ReferenceNCBI/TE_DatabaseFlybase/FlyBase_TE.fa" 
+#run_blast_te(Query,TEDB, 0,10,0)
+
+if __name__ == "__main__":
+    main()
