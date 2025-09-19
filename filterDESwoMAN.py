@@ -568,7 +568,7 @@ def main():
     Valid_neORFs = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList, mutations, frame)     
     create_output(DESwoMANPath, Valid_neORFs, Outpath, SpeciesList)
     print("\nFinished!")
-    print("Goodybe ;)")     
+    print("Goodybe :)")     
 
 if __name__ == "__main__":
     main()

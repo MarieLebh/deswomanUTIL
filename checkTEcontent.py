@@ -172,7 +172,7 @@ def main():
     print("Welcome to the TE stats tool")
     run_blast_te(NeORF, TE, Cov, Eval, Pident)
     print("Sucessfully generated simple TE stats.")
-    print("Goodybe ;)")
+    print("Goodybe :)")
         
 # Example usage:
 #Query ="/global/students/research/m_lebh01/DESwoMAN/FinalTestDESwoMAN/MarieCorrections/genomes_strat1/AK5/denovo_nucl.fa"

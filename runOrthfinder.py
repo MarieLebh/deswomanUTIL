@@ -101,7 +101,7 @@ def main():
         run_Orthofinder(num_threads)
 
     print("Finished!")
-    print("Goodybe ;)")
+    print("Goodybe :)")
     
 if __name__ == "__main__":
     main()

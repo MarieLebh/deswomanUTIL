@@ -143,7 +143,7 @@ def main():
     filter_output(OrthoPath, DESwoMANPath,File)  
 
     print("Finished!")
-    print("Goodybe ;)")
+    print("Goodybe :)")
 
 if __name__ == "__main__":
     main()

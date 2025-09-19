@@ -218,7 +218,7 @@ def main():
     print("Welcome to the deswomanUTIL gff converter...\n\nStarting the file transformation now!\n")
     generate_final_file(DESwoMANPath, GTF, Outname)
     print("Your file was successfully transformed!!")
-    print("Goodybe ;)")
+    print("Goodybe :D")
     
 if __name__ == "__main__":
     main()

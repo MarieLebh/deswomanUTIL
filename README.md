@@ -57,6 +57,10 @@ __Usage:__
 ```python3 getGFFfromOut.py [-h] --deswoman PATH/TO/DESWOMAN/info_file.txt --gtf Path/To/GTF --outname Path/To/OUTNAME```
 
 ## 3) runOrthofinder.py
+
+> [!IMPORTANT]
+> [OrthoFinder](https://github.com/davidemms/OrthoFinder) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
+
 Prepares your input for [OrthoFinder](https://github.com/davidemms/OrthoFinder) and then runs it with a given number of threads.
 
 - `--create_folder` Only create the orthofinder input files/folder and exit. Do not run Orthofinder.
@@ -79,13 +83,32 @@ __Usage:__
 
 
 ## 5) checkTEcontent.py
+
+> [!IMPORTANT]
+> [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
+
 Get a fast overview of the neORFs TE content using a TE library
 
 - `--cov` Blast coverage for TE search (float, default = 80)
-- `--evalue` Evalue for TE search (float, default = 0.001)
+- `--evalue` Evalue for TE search (float, default = 0.01)
 - `--NeORF` Path to the neORF fasta file (nucleotide)
 - `--perc_ident` Percent identity for TE search (float, default = 80)
 - `--TE_db` Path to the TE database (fasta file)
+
+__Usage:__
+```checkTEcontent.py [-h] [--NeORF NEORF] [--TE_db TE_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV]```
+
+## 6) denovoDataComparator.py
+
+> [!IMPORTANT]
+> [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
+
+Do a simple nucleotide or protein blast between two de novo gene datasets (e.g. your DESwoMAN output vs. a published set) to see how many have a hit.
+- `--cov` Blast coverage for search (float, default = 80)
+- `--evalue` Evalue for search (float, default = 0.01)
+- `--NeORF` Path to the neORF fasta file (nucleotide)
+- `--perc_ident` Percent identity for blast search (float, default = 80)
+- `--denovo_db` Path to the de novo gene database (fasta file, nucleotides or amino acids)
 
 __Usage:__
 ```checkTEcontent.py [-h] [--NeORF NEORF] [--TE_db TE_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV]```
