@@ -4,6 +4,14 @@ Some helper scripts to work with the DESwoMAN output.
 > [!IMPORTANT]
 > This script has not been extensively tested so use at your own risk and double check the results. 
 
+## Content
+[How to use](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#how-to-use)  <br />
+[Filter the DESwoMAN output](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#1-filterdeswomanpy) <br />
+[Convert the DESwoMAN information file to gff format](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#2-getgfffromoutpy) <br />
+[Format the DESwoMAN data for OrthoFinder and run it](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#3-runorthofinderpy) <br />
+[Remove coding homologs from the DESwoMAN output (Step3) based on Orthofinder results](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#4-removecodingfromfile3py) <br />
+[Check how many neORFs overlap with TE using a fasta library](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#5-checktecontentpy) <br />
+[Compare your neORFs with another (fasta) dataset and see how many are shared](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#6-denovodatacomparatorpy)
 
 ## How to use:
 **Step1:**  Clone this repository:
@@ -19,7 +27,7 @@ Some helper scripts to work with the DESwoMAN output.
 That's it! Now you can use the individual scripts and work with your deswoman output. :smile:
 
 
-## 1) filterDESwoMAN.py
+## 1) Filter the DESwoMAN output with "filterDESwoMAN.py"
 
 > [!IMPORTANT]
 > This script allows to select which mutations would be considered "enabling" and thus the absence of which features would deem a homolog noncoding. Per default the presence of one of these mutations would deem the homolog "noncoding":
@@ -75,8 +83,8 @@ __Usage:__
 
 
 
-## 2) getGFFfromOut.py
-Generate a gff file with all neORF candidates from the DESwoMAN info file. 
+## 2) Extract Gff files from the DESwoMAN output with "getGFFfromOut.py"
+Generate a gff file (including exon, cds, utr and start/stop codon positions) with all neORF candidates from the DESwoMAN info file. 
 
 - `--deswoman` Path to the deswoman information file
 - `--gtf` Path to the corresponding transcriptome assembly (gtf)
@@ -85,7 +93,7 @@ Generate a gff file with all neORF candidates from the DESwoMAN info file.
 __Usage:__
 ```python3 getGFFfromOut.py [-h] --deswoman PATH/TO/DESWOMAN/info_file.txt --gtf Path/To/GTF --outname Path/To/OUTNAME```
 
-## 3) runOrthofinder.py
+## 3) Prepare DESwoMAN files for OrthoFinder and run it with "runOrthofinder.py"
 
 > [!IMPORTANT]
 > [OrthoFinder](https://github.com/davidemms/OrthoFinder) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
@@ -100,7 +108,7 @@ Prepares your input for [OrthoFinder](https://github.com/davidemms/OrthoFinder) 
 __Usage:__
 ```runOrthfinder.py [-h] [--threads THREADS] [--create_folder] [--species_file SPECIES_FILE] [--deswoman DESWOMAN]```
 
-## 4) removeCodingfromFile3.py
+## 4) Remove coding homologs from the Step 3 output file with "removeCodingfromFile3.py"
 Remove noncoding homologs that have an expressed homolog via [OrthoFinder](https://github.com/davidemms/OrthoFinder).
 
 - `--deswoman` Path to the deswoman folder (NOT: info file!)
@@ -111,7 +119,7 @@ __Usage:__
 ```removeCodingfromFile3.py [-h] [--ortho ORTHO] [--deswoman DESWOMAN] [--query_file QUERY_FILE]```
 
 
-## 5) checkTEcontent.py
+## 5) Get some basic TE statistics with "checkTEcontent.py"
 
 > [!IMPORTANT]
 > [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
@@ -127,7 +135,7 @@ Get a fast overview of the neORFs TE content using a TE library
 __Usage:__
 ```checkTEcontent.py [-h] [--NeORF NEORF] [--TE_db TE_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV]```
 
-## 6) denovoDataComparator.py
+## 6) Get a fast overview how many sequences your dataset shares with a comparable one using "denovoDataComparator.py"
 
 > [!IMPORTANT]
 > [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
