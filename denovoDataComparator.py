@@ -5,7 +5,6 @@ import sys
 import os
 import subprocess
 from Bio import SeqIO
-import matplotlib.pyplot as plt
 
 """
 Compare your neORFs with another de novo gene library (using blast) and get some stats of how similar they are

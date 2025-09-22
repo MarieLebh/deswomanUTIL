@@ -1,11 +1,23 @@
 # deswomanUTIL
-Some scripts to deal with the DESwoMAN output.
+Some helper scripts to work with the DESwoMAN output.
 <img width="1214" height="159" alt="image" src="Logo.png" />
 > [!IMPORTANT]
 > This script has not been extensively tested so use at your own risk and double check the results. 
 
-> [!IMPORTANT]
-> For most scripts the input needs to be formatted in a specific way. Make sure to check the [Test dataset](https://github.com/MarieLebh/deswomanUTIL/tree/main/Test) to see how to structure your data. 
+
+## How to use:
+**Step1:**  Clone this repository:
+``https://github.com/MarieLebh/deswomanUTIL.git``
+
+**Step 2:**  Install [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) and/or [OrthoFinder](https://github.com/davidemms/OrthoFinder). For more details check the respective documentation. They need to be directly callable from the command line so you might have to add them to PATH.
+
+**Step 3:**  Install [Biopython (version 1.85)](https://biopython.org/wiki/Download):
+``pip install biopython``
+
+**Step 4:**  Make sure you have all required files ready to use. If you are not sure how to do it, check out the [Test dataset](https://github.com/MarieLebh/deswomanUTIL/tree/main/Test) and structure your own data accordingly.
+
+That's it! Now you can use the individual scripts and work with your deswoman output. :smile:
+
 
 ## 1) filterDESwoMAN.py
 
