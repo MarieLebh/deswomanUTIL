@@ -251,7 +251,18 @@ def run_blast_te(PathToTE:str, Coverage:float, Evalue:float, Identity:float, Str
     Returns:
     -Nothing
     """
-    subprocess.call(f'blastn -query neORFs_Nuc_all.fa -subject {PathToTE} -perc_identity {Identity} -qcov_hsp_perc {Coverage} -strand {Strand} -evalue {Evalue} -outfmt "6 qseqid sseqid evalue" -out Blast_out', shell = True) 
+    cmd = [
+        "blastn",
+        "-query", "neORFs_Nuc_all.fa",
+        "-subject", PathToTE,
+        "-perc_identity", str(Identity),
+        "-qcov_hsp_perc", str(Coverage),
+        "-strand", Strand,
+        "-evalue", str(Evalue),
+        "-outfmt", "6 qseqid sseqid evalue",
+        "-out", "Blast_out"
+    ]
+    subprocess.run(cmd, check=True)
 
 def get_TE_neORFs(ORF_list:list)->tuple[list,list]:
     """
@@ -435,7 +446,7 @@ def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesLis
         print("[Note:]\nYour output will not be filtered as there is nothing to filter out. Exiting...")
         sys.exit()
 
-    subprocess.call(f"mkdir {Outpath}", shell = True)
+    subprocess.run(["mkdir", Outpath], check = True)
 
     x = get_populations(SpeciesList)
     print("#####################\nStarting to filter the DESwoMAN output\n#####################")
@@ -451,7 +462,7 @@ def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesLis
         HomologFile= open(f"{PathToDESwoMAN}/{line}/Table_output_step3.txt", "r") 
 
         #make a new directory for the filtered files
-        subprocess.call(f"mkdir {Outpath}/{line}/", shell = True)
+        subprocess.run(["mkdir", f"{Outpath}/{line}/"], check = True)
 
         #Redo the protein file
         NewProt = open(f"{Outpath}/{line}/denovo_protein.fa", "w")

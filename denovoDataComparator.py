@@ -29,7 +29,22 @@ def run_blastn(PathToFasta:str, PathToDB:str, Coverage:float, Evalue:float, Iden
     -Nothing
     """
     #Run the blast
-    subprocess.call(f'blastn -query {PathToFasta} -subject {PathToDB} -perc_identity {Identity} -qcov_hsp_perc {Coverage} -evalue {Evalue} {Strand} -outfmt "6 qseqid sseqid qstart qend qlen" -out Blast_out', shell = True) 
+    cmd = [
+    "blastn",
+    "-query", PathToFasta,
+    "-subject", PathToDB,
+    "-perc_identity", str(Identity),
+    "-qcov_hsp_perc", str(Coverage),
+    "-evalue", str(Evalue),
+]
+    # If a strand is specified
+    if Strand:
+        cmd += Strand.split() 
+    cmd += [
+        "-outfmt", "6 qseqid sseqid qstart qend qlen",
+        "-out", "Blast_out"
+    ]
+    subprocess.run(cmd, check = True)
     #Safe all neORF nucleotides in a dictionary and fill an empty TE dictionary
     Nuc_dict = SeqIO.to_dict(SeqIO.parse(PathToFasta, "fasta"))
     Hitdict = {} #Store the hits
@@ -68,7 +83,16 @@ def run_blastp(PathToFasta:str, PathToDB:str, Coverage:float, Evalue:float, Iden
     -Nothing
     """
     #Run the blast
-    subprocess.call(f'blastp -query {PathToFasta} -subject {PathToDB} -qcov_hsp_perc {Coverage} -evalue {Evalue} -outfmt "6 qseqid sseqid qstart qend qlen pident" -out Blast_out', shell = True) 
+    cmd = [
+    "blastp",
+    "-query", PathToFasta,
+    "-subject", PathToDB,
+    "-qcov_hsp_perc", str(Coverage),
+    "-evalue", str(Evalue),
+    "-outfmt", "6 qseqid sseqid qstart qend qlen pident",
+    "-out", "Blast_out"
+]
+    subprocess.run(cmd, check=True)
     #Safe all neORF nucleotides in a dictionary and fill an empty TE dictionary
     Nuc_dict = SeqIO.to_dict(SeqIO.parse(PathToFasta, "fasta"))
     Hitdict = {} #Store the hits

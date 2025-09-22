@@ -107,7 +107,17 @@ def run_blast_te(PathToFasta:str, PathToTE:str, Coverage:float, Evalue:float, Id
     -Nothing
     """
     #Run the blast
-    subprocess.call(f'blastn -query {PathToFasta} -subject {PathToTE} -perc_identity {Identity} -qcov_hsp_perc {Coverage} -evalue {Evalue} -outfmt "6 qseqid sseqid qstart qend qlen" -out Blast_out', shell = True) 
+    cmd = [
+        "blastn",
+        "-query", PathToFasta,
+        "-subject", PathToTE,
+        "-perc_identity", str(Identity),
+        "-qcov_hsp_perc", str(Coverage),
+        "-evalue", str(Evalue),
+        "-outfmt", "6 qseqid sseqid qstart qend qlen",
+        "-out", "Blast_out"
+    ]
+    subprocess.run(cmd, check=True)
     #Safe all neORF nucleotides in a dictionary and fill an empty TE dictionary
     Nuc_dict = SeqIO.to_dict(SeqIO.parse(PathToFasta, "fasta"))
     TE_dict = {}

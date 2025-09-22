@@ -38,7 +38,7 @@ def save_data(SpeciesFile:str, DESwoMAN:str):
     - Nothing (but creates Orthofinder input files)
     """
     x = get_populations(SpeciesFile)
-    subprocess.call("mkdir Orthofinder", shell = True)
+    subprocess.run(["mkdir", "Orthofinder"], check = True)
     for line in x:
         Out_dict = {}
         path = f"{DESwoMAN}{line}/denovo_protein.fa"
@@ -65,7 +65,10 @@ def run_Orthofinder(num_threads:int):
     """
     print("Starting to run Orthofinder:")
     sys.stdout.flush()
-    subprocess.call(f"orthofinder -f Orthofinder -t {num_threads}", shell = True)
+    cmd =["orthofinder",
+          "-f", "Orthofinder",
+          "-t", str(num_threads)]
+    subprocess.run(cmd, check = True)
     print("Finished running Orthofinder.")
     sys.stdout.flush()
 
