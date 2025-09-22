@@ -166,27 +166,33 @@ def get_acceptable_noncoding_homologs(PathToDESwoMAN:str, CodingDict:dict, Speci
 
             #Really complicated way deal with each mutation
             checks = []
-            if "start" in mutations:
+            if "start" in mutations:#start present in homolog
                 checks.append(start == "P")
-            if "stop" in mutations:
+            if "stop" in mutations: #stop present in homolog
                 checks.append(stop == "P")
-            if "premature_stop" in mutations:
+            if "premature_stop" in mutations: #no premature stop within x %
                 checks.append(premature_stop == "A")
-            if "complete" in mutations:
+            if "complete" in mutations: #whole homolog is fully transcribed
                 checks.append(transcription_status == "complete" or transcription_status == "NA")
-            if "partial" in mutations:
-                checks.append(transcription_status == "partial" or transcription_status == "NA")
-            if "reverse" in mutations:
-                checks.append(transcription_status == "reverse" or transcription_status == "NA")
-            if "frameshift" in mutations:
+            if "partial" in mutations: #whole homolog is fully OR partially transcribed
+                checks.append(transcription_status == "partial" or transcription_status=="complete" or transcription_status == "NA")
+            if "reverse" in mutations: #whole homolog is fully transcribed OR there is antisense transcription
+                checks.append(transcription_status == "reverse" or transcription_status=="complete" or transcription_status == "NA")
+            if "no_transcription" in mutations: #whole homolog is fully OR partially OR antisense transcribed
+                checks.append(transcription_status == "reverse" or transcription_status=="complete" or transcription_status=="partial" or transcription_status == "NA")
+            if "frameshift" in mutations: #Less than x percent is affected by frameshift
                 if perc_seq_not_affected_by_frameshift == "NA":
                     checks.append(False) #Just a placeholder so no error occurs, the line will be skipped due to start !=NA
                 else:
-                    checks.append(float(perc_seq_not_affected_by_frameshift) < frame)
+                    checks.append(float(perc_seq_not_affected_by_frameshift) >= frame)
+            if "keep_all" in mutations: #all homologs are considered to be noncoding (only homologs with NAs are excluded)
+                checks = [False]
             if l[2] == "P" and start != "NA": #Only include present homologs. 
                 if not all(checks):
                     #Check if any mutation is suggesting that the homolog is non coding
                     validated_count += 1
+                    #Just to check if this actually filters correctly. 
+                    #print(checks, "-----", start,stop, perc_seq_not_affected_by_frameshift, premature_stop, transcription_status)
                     if neORFID in AcceptedHomologs:
                         AcceptedHomologs[neORFID] += [TargetSpecies]
                     else: 

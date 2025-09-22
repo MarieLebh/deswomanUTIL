@@ -40,7 +40,18 @@ It is important that you did the following steps before running:
 2) You have a newick tree with all species (in- and outgroups) in your analysis (even if you also have populations this tree needs to contain 4 letter species ids). It is important that all internal nodes are named. Also no polytonies are allowed as this will lead to errors!
 3) Your samples have a four letter species id optionally followed by a sample id (if applicable) e.g. Dmel (for _Drosophila melanogaster_) or Hsap (for _Homo sapiens_).
 
-- `--accepted_mutations` Comma separated list of all mutations you want to count as noncoding (all possibilities are: start, stop, prematurestop and transcription (complete, partial and/or antisense))
+- `--accepted_mutations` Comma separated list of all mutations you want to count as noncoding. The possible mutations/features are:
+    - **start** = Start codon (ATG) is missing or incomplete in the homolog
+    - **stop** = Stop codon (TAA, TGA, TAG) is missing or incomplete in the homolog
+    - **premature_stop** = There is a premature stop codon (TAA, TGA, TAG) within the first x % of the homolog (=whichever theshold was specified during the DESwoMAN run)
+    - **frameshift** = Less than x % (specify with parameter below) of the reading frame is conserved in the homolog
+    - **complete** = The homolog is not transcribed completely ->_Decide on **one** transcription option to use. **Don't** combine multiple e.g. complete and partial._
+    - **partial** = The homolog is not transcribed completely nor partially
+    - **reverse** = The homolog is not transcribed completely nor is there antisense transcription
+    - **no_transcription** = There is no detected transcription at all in the homolog.
+    - **keep_all** = Ignore the mutations and keep all ORFs (only filters out instances with no detected homolog)
+     ->_If you choose this option then **don't** select any of the others_
+
 - `--frameshift_score` Maximum percent of frame conservation above which it will be considered coding
 - `--deswoman` Path to the DESwoMAN folder. Its necessary that you run DESwoMAN for all species.
 - `--ortho` Path to an Orthogroup file ("Orthogroups.txt", str) generated with Orthofinder and including the filename
