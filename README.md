@@ -26,7 +26,7 @@ That's it! Now you can use the individual scripts and work with your deswoman ou
 > - Absence of a canonical start codon (ATG)
 > - Absence of a stop codon (TAA, TAG, TGA)
 > - Absence of complete transcription. That means not the complete homolog is transcribed. It can however be partly transcribed. There might also be antisense transcription.
-> - A premature stop codon in the first x % of the sequence (the x corresponds to what the threshold selected during the preceeding DESwoMAN run).
+> - A premature stop codon in the first x % of the sequence (the x corresponds to the threshold selected during the preceeding DESwoMAN run).
 > - Less than 50 % of the reading frame is conserved in the homolog.
 >
 > If none of these features are missing the homolog will be considered "potentially coding" and the script requires a noncoding homolog in a more distant outgroup. Otherwise the ORF is excluded as its _de novo_ status could not be confirmed.
