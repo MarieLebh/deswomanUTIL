@@ -6,12 +6,12 @@ Some helper scripts to work with the DESwoMAN output.
 
 ## Content
 [How to use](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#how-to-use)  <br />
-[Filter the DESwoMAN output](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#1-filterdeswomanpy) <br />
-[Convert the DESwoMAN information file to gff format](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#2-getgfffromoutpy) <br />
-[Format the DESwoMAN data for OrthoFinder and run it](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#3-runorthofinderpy) <br />
-[Remove coding homologs from the DESwoMAN output (Step3) based on Orthofinder results](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#4-removecodingfromfile3py) <br />
-[Check how many neORFs overlap with TE using a fasta library](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#5-checktecontentpy) <br />
-[Compare your neORFs with another (fasta) dataset and see how many are shared](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#6-denovodatacomparatorpy)
+[Filter the DESwoMAN output](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#1-filter-the-deswoman-output-with-filterdeswomanpy) <br />
+[Convert the DESwoMAN information file to gff format](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#2-extract-gff-files-from-the-deswoman-output-with-getgfffromoutpy) <br />
+[Format the DESwoMAN data for OrthoFinder and run it](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#3-prepare-deswoman-files-for-orthofinder-and-run-it-with-runorthofinderpy) <br />
+[Remove coding homologs from the DESwoMAN output (Step3) based on Orthofinder results](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#4-remove-coding-homologs-from-the-step-3-output-file-with-removecodingfromfile3py) <br />
+[Check how many neORFs overlap with TE using a fasta library](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#5-get-some-basic-te-statistics-with-checktecontentpy) <br />
+[Compare your neORFs with another (fasta) dataset and see how many are shared](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#6-get-a-fast-overview-how-many-sequences-your-dataset-shares-with-a-comparable-one-using-denovodatacomparatorpy)
 
 ## How to use:
 **Step1:**  Clone this repository:
