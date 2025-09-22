@@ -21,9 +21,15 @@ That's it! Now you can use the individual scripts and work with your deswoman ou
 
 ## 1) filterDESwoMAN.py
 
-> [!TIP]
-> This script allows some flexibility in deciding which mutations are considered to deem a homolog "noncoding".
-> It is important to state that some are likely more disrupting than others e.g. a frameshift mutation or a premature stop early in the sequence (-> frame conservation score) likely disrupt the noncoding sequence more than a missing start (-> sequence might still be translated due to a non canonical start codon). Missing transcription is also biased by the RNAseq data used and should therefore be treated with caution. 
+> [!IMPORTANT]
+> This script allows to select which mutations would be considered "enabling" and thus the absence of which features would deem a homolog noncoding. Per default the presence of one of these mutations would deem the homolog "noncoding":
+> - Absence of a canonical start codon (ATG)
+> - Absence of a stop codon (TAA, TAG, TGA)
+> - Absence of complete transcription. That means not the complete homolog is transcribed. It can however be partly transcribed. There might also be antisense transcription.
+> - A premature stop codon in the first x % of the sequence (the x corresponds to what the threshold selected during the preceeding DESwoMAN run).
+> - Less than 50 % of the reading frame is conserved in the homolog.
+>
+> If none of these features are missing the homolog will be considered "potentially coding" and the script requires a noncoding homolog in a more distant outgroup. Otherwise the ORF is excluded as its _de novo_ status could not be confirmed.
 
 > [!IMPORTANT]
 > [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
