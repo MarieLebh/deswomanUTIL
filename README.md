@@ -48,6 +48,9 @@ It is important that you did the following steps before running:
 2) You have a newick tree with all species (in- and outgroups) in your analysis (even if you also have populations this tree needs to contain 4 letter species ids). It is important that all internal nodes are named. Also no polytonies are allowed as this will lead to errors!
 3) Your samples have a four letter species id optionally followed by a sample id (if applicable) e.g. Dmel (for _Drosophila melanogaster_) or Hsap (for _Homo sapiens_).
 
+<img width="650" height="300" alt="image" src="FilteringWorkflow.png" /><br /><br />
+
+
 - `--accepted_mutations` Comma separated list of all mutations you want to count as noncoding. The possible mutations/features are:
     - **start** = Start codon (ATG) is missing or incomplete in the homolog
     - **stop** = Stop codon (TAA, TGA, TAG) is missing or incomplete in the homolog
