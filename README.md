@@ -92,6 +92,8 @@ Generate a [gff file](https://www.ensembl.org/info/website/upload/gff.html) (inc
 - `--gtf` Path to the corresponding transcriptome assembly (gtf)
 - `--outname` Name of the output file (default: DESwoMAN)
 - `--add_stringtie_locus` Add the underlying gene locus for each de novo transcript based on the [stringtie gene id](https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual)
+- `--collapse_denovo` Only collapse the transcript coordinates for the de novo transcripts corresponding to a neORF (not any transcript)
+- `--collapse_orf` Collapse the neORF coordinates getting the genomic region spanned by neORFs underlying one locus but ignoring UTRs
 
 __Usage:__
 ```getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus]```

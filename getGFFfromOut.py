@@ -107,7 +107,7 @@ def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
                     ".",
                     strand,
                     ".",
-                    f'gene_id "{orfname.split("_")[0][:-2]}"; transcript_id "{orfname.split("_")[0]}"; neORF_id "{orfname}"'
+                    f'gene_id "{orfname.split("_")[0][:-2]}"; transcript_id "{orfname.split("_")[0]}"; neORF_id "{orfname}";'
                 ]
                 #Save the CDS gff formatted lines for the gff in a dictionary
                 if orfname.split("_")[0] in FinalDict:
@@ -117,52 +117,105 @@ def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
             transcript_pointer += exon_len
     return FinalDict
 
-def find_gene_coordinates(GTF:str)->dict:
+def get_denovo_transcript_ids(PathToDESwoMAN:str)->list:
+    """
+    Extracts all de novo gene IDs from the information file
+ 
+    Parameters: 
+    - PathToDESwoMAN (str): Path to the DESwoMAN information file
+    
+    Returns:
+    - list: List with all de novo transcript ids
+    """
+    DeNovoList = []
+    InfoFile =  open(PathToDESwoMAN , "r")
+    for li in InfoFile:        
+        l = li.strip().split(",")
+        if l[0] != "gene_name":
+            DeNovoList.append(l[5])
+    return DeNovoList
+
+def find_gene_coordinates(GTF:str, only_de_novo:bool, PathToDESwoMAN:str)->dict:
     """
     Finds the underlying parent gene loci from stringtie
  
     Parameters: 
     - GTF (str): Path to the transcriptome gtf file
+    - only_de_novo (bool): Only include the transcripts corresponding to de novo ORFs
+    - PathToDESwoMAN (str): Path to the DESwoMAN information file
     
     Returns:
     - dict: Dictionary with the gene dict lines
     """
     GTFfile = open(GTF, "r")
+    if only_de_novo:
+        DeNovoList = get_denovo_transcript_ids(PathToDESwoMAN) #Get the de novo transcript ids
     PositionDict = {}
     for line in GTFfile:
         if line[0] != "#":
             l = line.split("\t")
             gene_id = l[8].split(";")[0].split(" ")[1][1:-1]
             if l[2] == "transcript":
+                if only_de_novo:
+                    if l[8].split(";")[1].split(" ")[2][1:-1] not in DeNovoList:
+                        continue
                 if gene_id in PositionDict:
-                    PositionDict[gene_id][0].append(l[3])
-                    PositionDict[gene_id][1].append(l[4])
+                    PositionDict[gene_id][0].append(int(l[3]))
+                    PositionDict[gene_id][1].append(int(l[4]))
                 else:
-                    PositionDict[gene_id]= [[l[3]],[l[4]], l[6], l[0]]
+                    PositionDict[gene_id]= [[int(l[3])],[int(l[4])], l[6], l[0]]
     FinalPositions = {}
     for key, value in PositionDict.items():
         #Start is the lowest of the start positions, End is the highest of the end positions
         FinalPositions[key] = f'{value[3]}\tStringtie\tgene_locus\t{str(min(value[0]))}\t{str(max(value [1]))}\t1000\t{value[2]}\t.\tgene_id "{key}";\n'
     return FinalPositions
 
-
-def generate_final_file(DESwoMAN:str, GTF:str, Outname:str, AddLocus:str):
+def collapse_samegene_orf(PathToDESwoMAN:str)->dict:
     """
-    Generate a final file from the DESwoMAN output
+    Finds the underlying parent gene loci from stringtie
  
     Parameters: 
-    - DESwoMAN (str): Path to the DESwoMAN info file
-    - GTF (str): Path to the transcriptome gtf file
-    -Outname (str): Name of the output file
-    -AddLocus (str): Add the stringtie gene locus (can be Yes or No)
+    - PathToDESwoMAN (str): Path to the DESwoMAN info file
     
+    Returns:
+    - dict: Dictionary with the gene dict lines
+    """
+    #Now open the DESwoMAN information file to get the necessary position information for each neORF
+    InfoFile =  open(PathToDESwoMAN , "r")
+    NeORFs = {}
+    for li in InfoFile:        
+        l = li.strip().split(",")
+        if l[0] != "gene_name":
+            if l[0] not in NeORFs:
+                NeORFs[l[0]] = [[int(l[-3])+1],[int(l[-2])+1], l[1], l[2]]
+            else:
+                NeORFs[l[0]][0].append(int(l[-3])+1)
+                NeORFs[l[0]][1].append(int(l[-2])+1)
+    Final = {}
+    InfoFile.close()
+    for key in NeORFs:
+        Final[key] = f'{NeORFs[key][2]}\tdeswomanUTIL\tcollapsed_neORF\t{min(NeORFs[key][0])}\t{max(NeORFs[key][1])}\t.\t{NeORFs[key][3]}\t.\tgene_id "{key}";\n'
+    return Final
+
+def generate_final_file(DESwoMAN:str, GTF:str, Outname:str, AddLocus:str, CollapseORFs:str, only_de_novo:bool):
+    """
+    Add a gene id column but ony include transcripts that have an ORF
+ 
+    Parameters: 
+    -DESwoMAN (str): Path to the DESwoMAN info file
+    -GTF (str): Path to the transcriptome gtf file
+    -Outname (str): Name of the output file
+    -AddLocus (str): Add the stringtie gene locus 
+    -CollapseORFs (str): Add the collapsed ORFs to the gtf file
+    -only_de_novo (bool): Only include transcripts corresponding to neORFs
+
     Returns:
     - nothing
     """
     #Open all files/extract all information
     DESWOMAN = open(DESwoMAN, "r")
     Out = open(Outname + ".gff", "w")
-    Out.write(f"# deswomanUTIL -in {DESwoMAN} -gtf {GTF} {AddLocus}\n# version 1\n")    
+    Out.write(f"# deswomanUTIL -in {DESwoMAN} -gtf {GTF} {AddLocus} {CollapseORFs} {only_de_novo}\n# version 1\n")    
     CDS= extract_cds_bed(DESwoMAN, GTF)
 
     #Initiate dictionary to save the results
@@ -187,16 +240,25 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str, AddLocus:str):
 
     #Now parse the CDS dictionary and (if required) add a gene locus
     if AddLocus:
-        Genes = find_gene_coordinates(GTF)
+        Genes = find_gene_coordinates(GTF, only_de_novo, DESwoMAN)
         Checked = []
-
+    
+    if CollapseORFs:
+        Collapsed = collapse_samegene_orf(DESwoMAN)
+        Checked2 = []
     for key in CDS:
         for value in CDS[key]:
             SaveDict[key] += value
+
         if AddLocus:
             if key.split(".")[0]+ "." + key.split(".")[1] not in Checked:
                 SaveDict[key]+= Genes[key.split(".")[0]+ "." + key.split(".")[1]]
             Checked.append(key.split(".")[0]+ "." + key.split(".")[1]) #Add gene id here so its only added once to the gtf
+
+        if CollapseORFs:
+            if key.split(".")[0]+ "." + key.split(".")[1] not in Checked2:
+                SaveDict[key]+= Collapsed[key.split(".")[0]+ "." + key.split(".")[1]]
+            Checked2.append(key.split(".")[0]+ "." + key.split(".")[1]) #Add gene id here so its only added once to the gtf
 
     #Now parse the gtf file 
     GTFfile = open(GTF, "r")     
@@ -238,6 +300,8 @@ def main():
     parser.add_argument("--gtf", help="Path to the transcriptome gtf file", type=str)
     parser.add_argument("--outname", help="Name of the output file (no file extension)", type=str, default = "DESwoMAN")
     parser.add_argument("--add_stringtie_locus", help="Name of the output file (no file extension)", action = "store_true")
+    parser.add_argument("--collapse_orf", help="Collapse the coordinates of all neORFs with the same gene id in a gene column", action = "store_true")
+    parser.add_argument("--collapse_denovo", help="Collapse the coordinates of all de novo transcripts with the same gene id in a gene column", action = "store_true")
     print("-------------------------\nGet a DESwoMAN GFF file\nV.1.0\nAuthor:Marie Lebherz\n-------------------------\n")
 
     #Read the input    
@@ -245,6 +309,7 @@ def main():
     GTF =args.gtf
     DESwoMANPath = args.deswoman
     Outname = args.outname
+
 
     #Check if all is correct
     if not DESwoMANPath:
@@ -256,11 +321,15 @@ def main():
 
     #Start running the analysis
     print("Welcome to the deswomanUTIL gff converter...\n\nStarting the file transformation now!\n")
-
+    gene, collapse, collapse_dn = "","", ""
     if args.add_stringtie_locus: #add gene locus
-        generate_final_file(DESwoMANPath, GTF, Outname, "--add_stringtie_locus")
-    else: #don't add gene_locus
-        generate_final_file(DESwoMANPath, GTF, Outname, "")
+        gene = "--add_stringtie_locus"
+    if args.collapse_orf:
+        collapse = "--collapse_orf"
+    if args.collapse_denovo:
+        collapse_dn = "--collapse_denovo"
+
+    generate_final_file(DESwoMANPath, GTF, Outname, gene, collapse,collapse_dn)
 
     print("Your file was successfully transformed!!")
     print("Goodybe :D")
