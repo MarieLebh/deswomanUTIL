@@ -11,7 +11,7 @@ Author: Marie
 Date: 10.09.2025
 Edited: 11.09.2025
 
-usage: getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME]
+usage: getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus]
 
 For each neORF this will extract:
 (1) Exon positions (Can simply take from gtf) 
@@ -21,6 +21,7 @@ For each neORF this will extract:
 (5) Stop codon
 (6) Transcript position 
 (7) NeORF position 
+(8) Optional: Underlying gene locus
 """
 
 def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
@@ -116,23 +117,52 @@ def extract_cds_bed(PathToDESwoMAN:str ,PathToTranscriptome:str)->dict:
             transcript_pointer += exon_len
     return FinalDict
 
+def find_gene_coordinates(GTF:str)->dict:
+    """
+    Finds the underlying parent gene loci from stringtie
+ 
+    Parameters: 
+    - GTF (str): Path to the transcriptome gtf file
+    
+    Returns:
+    - dict: Dictionary with the gene dict lines
+    """
+    GTFfile = open(GTF, "r")
+    PositionDict = {}
+    for line in GTFfile:
+        if line[0] != "#":
+            l = line.split("\t")
+            gene_id = l[8].split(";")[0].split(" ")[1][1:-1]
+            if l[2] == "transcript":
+                if gene_id in PositionDict:
+                    PositionDict[gene_id][0].append(l[3])
+                    PositionDict[gene_id][1].append(l[4])
+                else:
+                    PositionDict[gene_id]= [[l[3]],[l[4]], l[6], l[0]]
+    FinalPositions = {}
+    for key, value in PositionDict.items():
+        #Start is the lowest of the start positions, End is the highest of the end positions
+        FinalPositions[key] = f'{value[3]}\tStringtie\tgene_locus\t{str(min(value[0]))}\t{str(max(value [1]))}\t1000\t{value[2]}\t.\tgene_id "{key}";\n'
+    return FinalPositions
 
-def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
+
+def generate_final_file(DESwoMAN:str, GTF:str, Outname:str, AddLocus:str):
     """
     Generate a final file from the DESwoMAN output
  
     Parameters: 
     - DESwoMAN (str): Path to the DESwoMAN info file
     - GTF (str): Path to the transcriptome gtf file
-
+    -Outname (str): Name of the output file
+    -AddLocus (str): Add the stringtie gene locus (can be Yes or No)
+    
     Returns:
     - nothing
     """
     #Open all files/extract all information
     DESWOMAN = open(DESwoMAN, "r")
-    GTFfile = open(GTF, "r")
     Out = open(Outname + ".gff", "w")
-    Out.write(f"# deswomanUTIL -in {DESwoMAN} -gtf {GTF} \n# version 1\n")    
+    Out.write(f"# deswomanUTIL -in {DESwoMAN} -gtf {GTF} {AddLocus}\n# version 1\n")    
     CDS= extract_cds_bed(DESwoMAN, GTF)
 
     #Initiate dictionary to save the results
@@ -143,7 +173,7 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
     for line in DESWOMAN:
         l = line.split(",")
         SaveDict[l[5]] = [f'{l[1]}\tDESwoMAN\tneORF\t{int(l[-3])+1}\t{int(l[-2])+1}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
-
+    
         if l[2] == "+":
             SaveDict[l[5]] += [f'{l[1]}\tdeswomanUTIL\tstart_codon\t{int(l[-3])+1}\t{int(l[-3])+4}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
             SaveDict[l[5]] += [f'{l[1]}\tdeswomanUTIL\tstop_codon\t{int(l[-2])-2}\t{int(l[-2])+1}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
@@ -154,19 +184,28 @@ def generate_final_file(DESwoMAN:str, GTF:str, Outname:str):
             SaveDict[l[5]] += [f'{l[1]}\tdeswomanUTIL\tstart_codon\t{int(l[-2])-2}\t{int(l[-2])+1}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
             SaveDict[l[5]] += [f'{l[1]}\tdeswomanUTIL\t5_prime_utr\t{int(l[11])+2}\t{int(l[7])}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
             SaveDict[l[5]] += [f'{l[1]}\tdeswomanUTIL\t3_prime_utr\t{int(l[6])}\t{int(l[10])}\t.\t{l[2]}\t.\tgene_id "{l[0]}"; transcript_id "{l[5]}"; neORF_id "{l[-4]}";\n']
-       
+
+    #Now parse the CDS dictionary and (if required) add a gene locus
+    if AddLocus:
+        Genes = find_gene_coordinates(GTF)
+        Checked = []
+
+    for key in CDS:
+        for value in CDS[key]:
+            SaveDict[key] += value
+        if AddLocus:
+            if key.split(".")[0]+ "." + key.split(".")[1] not in Checked:
+                SaveDict[key]+= Genes[key.split(".")[0]+ "." + key.split(".")[1]]
+            Checked.append(key.split(".")[0]+ "." + key.split(".")[1]) #Add gene id here so its only added once to the gtf
+
     #Now parse the gtf file 
+    GTFfile = open(GTF, "r")     
     for line in GTFfile:
         if line[0] != "#":
             l = line.split("\t")
             if l[8].split(";")[1].split(" ")[2][1:-1] not in SaveDict:
                 continue
             SaveDict[l[8].split(";")[1].split(" ")[2][1:-1]] += [f'{l[0]}\tStringtie\t{l[2]}\t{l[3]}\t{l[4]}\t{l[5]}\t{l[6]}\t.\tgene_id "{l[8].split(";")[0].split(" ")[1][1:-1]}"; transcript_id "{l[8].split(";")[1].split(" ")[2][1:-1]}";\n']
-
-    #Now parse the CDS dictionary
-    for key in CDS:
-        for value in CDS[key]:
-            SaveDict[key] += value
 
     #Now write all information to the output gff
     for key in SaveDict:
@@ -198,6 +237,7 @@ def main():
     parser.add_argument("--deswoman", help="Path to the DESwoMAN info file", type=str)
     parser.add_argument("--gtf", help="Path to the transcriptome gtf file", type=str)
     parser.add_argument("--outname", help="Name of the output file (no file extension)", type=str, default = "DESwoMAN")
+    parser.add_argument("--add_stringtie_locus", help="Name of the output file (no file extension)", action = "store_true")
     print("-------------------------\nGet a DESwoMAN GFF file\nV.1.0\nAuthor:Marie Lebherz\n-------------------------\n")
 
     #Read the input    
@@ -216,7 +256,12 @@ def main():
 
     #Start running the analysis
     print("Welcome to the deswomanUTIL gff converter...\n\nStarting the file transformation now!\n")
-    generate_final_file(DESwoMANPath, GTF, Outname)
+
+    if args.add_stringtie_locus: #add gene locus
+        generate_final_file(DESwoMANPath, GTF, Outname, "--add_stringtie_locus")
+    else: #don't add gene_locus
+        generate_final_file(DESwoMANPath, GTF, Outname, "")
+
     print("Your file was successfully transformed!!")
     print("Goodybe :D")
     

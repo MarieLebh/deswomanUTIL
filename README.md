@@ -8,10 +8,10 @@ Some helper scripts to work with the DESwoMAN output.
 [How to use](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#how-to-use)  <br />
 [Filter the DESwoMAN output](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#1-filter-the-deswoman-output-with-filterdeswomanpy) <br />
 [Convert the DESwoMAN information file to gff format](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#2-extract-gff-files-from-the-deswoman-output-with-getgfffromoutpy) <br />
-[Format the DESwoMAN data for OrthoFinder and run it](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#3-prepare-deswoman-files-for-orthofinder-and-run-it-with-runorthofinderpy) <br />
-[Remove coding homologs from the DESwoMAN output (Step3) based on Orthofinder results](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#4-remove-coding-homologs-from-the-step-3-output-file-with-removecodingfromfile3py) <br />
-[Check how many neORFs overlap with TE using a fasta library](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#5-get-some-basic-te-statistics-with-checktecontentpy) <br />
-[Compare your neORFs with another (fasta) dataset and see how many are shared](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#6-get-a-fast-overview-how-many-sequences-your-dataset-shares-with-a-comparable-one-using-denovodatacomparatorpy)
+[Format the DESwoMAN data for OrthoFinder and run it](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#4-prepare-deswoman-files-for-orthofinder-and-run-it-with-runorthofinderpy) <br />
+[Remove coding homologs from the DESwoMAN output (Step3) based on Orthofinder results](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#5-remove-coding-homologs-from-the-step-3-output-file-with-removecodingfromfile3py) <br />
+[Check how many neORFs overlap with TE using a fasta library](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#6-get-some-basic-te-statistics-with-checktecontentpy) <br />
+[Compare your neORFs with another (fasta) dataset and see how many are shared](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#7-get-a-fast-overview-how-many-sequences-your-dataset-shares-with-a-comparable-one-using-denovodatacomparatorpy)
 
 ## How to use:
 **Step1:**  Clone this repository:
@@ -87,16 +87,28 @@ __Usage:__
 
 
 ## 2) Extract Gff files from the DESwoMAN output with "getGFFfromOut.py"
-Generate a gff file (including exon, cds, utr and start/stop codon positions) with all neORF candidates from the DESwoMAN info file. 
+Generate a [gff file](https://www.ensembl.org/info/website/upload/gff.html) (including exon, cds, utr and start/stop codon positions) with all neORF candidates from the DESwoMAN info file. 
 
 - `--deswoman` Path to the deswoman information file
 - `--gtf` Path to the corresponding transcriptome assembly (gtf)
 - `--outname` Name of the output file (default: DESwoMAN)
 
 __Usage:__
-```python3 getGFFfromOut.py [-h] --deswoman PATH/TO/DESWOMAN/info_file.txt --gtf Path/To/GTF --outname Path/To/OUTNAME```
+```getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus]```
 
-## 3) Prepare DESwoMAN files for OrthoFinder and run it with "runOrthofinder.py"
+## 3) Extract BED files from the DESwoMAN output with "getBEDfromOut.py"
+Generate a [BED file](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bed-format) with neORF and/or transcript coordinates from the DESwoMAN output. 
+
+- `--deswoman` Path to the deswoman information file
+- `--gtf` Path to the corresponding transcriptome assembly (gtf)
+- `--outname` Name of the output file (default: DESwoMAN)
+- `--choice` Extract a BEDfile with neORF or transcript coordinates (default = both)
+
+
+__Usage:__
+```python3 getBEDfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--choice CHOICE]```
+
+## 4) Prepare DESwoMAN files for OrthoFinder and run it with "runOrthofinder.py"
 
 > [!IMPORTANT]
 > [OrthoFinder](https://github.com/davidemms/OrthoFinder) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
@@ -111,7 +123,7 @@ Prepares your input for [OrthoFinder](https://github.com/davidemms/OrthoFinder) 
 __Usage:__
 ```runOrthfinder.py [-h] [--threads THREADS] [--create_folder] [--species_file SPECIES_FILE] [--deswoman DESWOMAN]```
 
-## 4) Remove coding homologs from the Step 3 output file with "removeCodingfromFile3.py"
+## 5) Remove coding homologs from the Step 3 output file with "removeCodingfromFile3.py"
 Remove noncoding homologs that have an expressed homolog via [OrthoFinder](https://github.com/davidemms/OrthoFinder).
 
 - `--deswoman` Path to the deswoman folder (NOT: info file!)
@@ -122,7 +134,7 @@ __Usage:__
 ```removeCodingfromFile3.py [-h] [--ortho ORTHO] [--deswoman DESWOMAN] [--query_file QUERY_FILE]```
 
 
-## 5) Get some basic TE statistics with "checkTEcontent.py"
+## 6) Get some basic TE statistics with "checkTEcontent.py"
 
 > [!IMPORTANT]
 > [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
@@ -138,7 +150,7 @@ Get a fast overview of the neORFs TE content using a TE library
 __Usage:__
 ```checkTEcontent.py [-h] [--NeORF NEORF] [--TE_db TE_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV]```
 
-## 6) Get a fast overview how many sequences your dataset shares with a comparable one using "denovoDataComparator.py"
+## 7) Get a fast overview how many sequences your dataset shares with a comparable one using "denovoDataComparator.py"
 
 > [!IMPORTANT]
 > [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
