@@ -96,7 +96,7 @@ Generate a [gff file](https://www.ensembl.org/info/website/upload/gff.html) (inc
 - `--collapse_orf` Collapse the neORF coordinates getting the genomic region spanned by neORFs underlying one locus but ignoring UTRs
 
 __Usage:__
-```getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus]```
+```getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus] [--collapse_denovo] [--collapse_orf]```
 
 ## 3) Extract BED files from the DESwoMAN output with "getBEDfromOut.py"
 Generate a [BED file](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bed-format) with neORF and/or transcript coordinates from the DESwoMAN output. Be aware that this script only produces BED6 format.
