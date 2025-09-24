@@ -63,7 +63,7 @@ It is important that you did the following steps before running:
      ->_If you choose this option then **don't** select any of the others_
 
 - `--frameshift_score` Maximum percent of frame conservation above which it will be considered coding
-- `--deswoman` Path to the DESwoMAN folder. Its necessary that you run DESwoMAN for all species.
+- `--deswoman` Path to the DESwoMAN folder. 
 - `--ortho` Path to an Orthogroup file ("Orthogroups.txt", str) generated with Orthofinder and including the filename
 - `--out` Name of the output folder to store the filtered data
 - `--rna_check` Blast against an rna database (e.g. cdna/ncrna) (default = false)
