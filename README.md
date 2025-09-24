@@ -94,6 +94,7 @@ Generate a [gff file](https://www.ensembl.org/info/website/upload/gff.html) (inc
 - `--gtf` Path to the corresponding transcriptome assembly (gtf)
 - `--outname` Name of the output file (default: DESwoMAN)
 - `--add_stringtie_locus` Add the underlying gene locus for each de novo transcript based on the [stringtie gene id](https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual)
+
 __Usage:__
 ```getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus]```
 
