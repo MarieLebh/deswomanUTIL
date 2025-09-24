@@ -1,8 +1,6 @@
 # deswomanUTIL
 Some helper scripts to work with the DESwoMAN output.
 <img width="1214" height="159" alt="image" src="Logo.png" />
-> [!IMPORTANT]
-> This script has not been extensively tested so use at your own risk and double check the results. 
 
 ## Content
 [How to use](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#how-to-use)  <br />
