@@ -8,6 +8,7 @@ Some helper scripts to work with the DESwoMAN output.
 [How to use](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#how-to-use)  <br />
 [Filter the DESwoMAN output](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#1-filter-the-deswoman-output-with-filterdeswomanpy) <br />
 [Convert the DESwoMAN information file to gff format](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#2-extract-gff-files-from-the-deswoman-output-with-getgfffromoutpy) <br />
+[Convert the DESwoMAN information file to BED6 format](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#3-extract-bed-files-from-the-deswoman-output-with-getbedfromoutpy) <br />
 [Format the DESwoMAN data for OrthoFinder and run it](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#4-prepare-deswoman-files-for-orthofinder-and-run-it-with-runorthofinderpy) <br />
 [Remove coding homologs from the DESwoMAN output (Step3) based on Orthofinder results](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#5-remove-coding-homologs-from-the-step-3-output-file-with-removecodingfromfile3py) <br />
 [Check how many neORFs overlap with TE using a fasta library](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#6-get-some-basic-te-statistics-with-checktecontentpy) <br />
@@ -92,12 +93,12 @@ Generate a [gff file](https://www.ensembl.org/info/website/upload/gff.html) (inc
 - `--deswoman` Path to the deswoman information file
 - `--gtf` Path to the corresponding transcriptome assembly (gtf)
 - `--outname` Name of the output file (default: DESwoMAN)
-
+- `--add_stringtie_locus` Add the underlying gene locus for each de novo transcript based on the [stringtie gene id](https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual)
 __Usage:__
 ```getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus]```
 
 ## 3) Extract BED files from the DESwoMAN output with "getBEDfromOut.py"
-Generate a [BED file](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bed-format) with neORF and/or transcript coordinates from the DESwoMAN output. 
+Generate a [BED file](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bed-format) with neORF and/or transcript coordinates from the DESwoMAN output. Be aware that this script only produces BED6 format.
 
 - `--deswoman` Path to the deswoman information file
 - `--gtf` Path to the corresponding transcriptome assembly (gtf)
