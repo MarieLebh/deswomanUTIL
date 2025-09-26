@@ -313,10 +313,10 @@ def main():
 
     #Check if all is correct
     if not DESwoMANPath:
-        print("No DESwoMAN path supplied. Exiting.")
+        print("[Error:] No DESwoMAN path supplied. Exiting.")
         sys.exit()
     elif not GTF:
-        print("No transcriptome assembly path supplied. Exiting.")
+        print("[Error:] No transcriptome assembly path supplied. Exiting.")
         sys.exit()
 
     #Start running the analysis

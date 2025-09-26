@@ -125,7 +125,7 @@ def main():
     parser = argparse.ArgumentParser(description="Filter coding homologs from the final DESwoMAN output using Orthofinder Orthogroups containing both query and outgroup expressed ORFs.",epilog="-------------------------")
     parser.add_argument("--ortho", help="Path to the Orthogroups.txt file from OrthoFinder (e.g. /home/usr/orthofinder/orthogroups.txt)", type=str)
     parser.add_argument("--deswoman", help="Path to the DESwoMAN Outputs folder (e.g. /home/usr/deswoman/, Default = working directory)", type=str, default = "")
-    parser.add_argument("--soecies_file", help="Path to a text file where each query species is on one line.", type=str)
+    parser.add_argument("--species_file", help="Path to a text file where each query species is on one line.", type=str)
 
     print("-------------------------\nRemove noncoding homologs that have an expressed homolog via Orthofinder\nV.1.0\nAuthor:Marie Lebherz\n-------------------------\n")
 
@@ -135,8 +135,12 @@ def main():
     OrthoPath = args.ortho
     File = args.species_file
 
-    if not DESwoMANPath or not OrthoPath or not DESwoMANPath:
-        print("Filepath missing! Exiting...")
+    if not DESwoMANPath or not OrthoPath or not DESwoMANPath or not File:
+        print("[Error:] Required input is missing. Please check!\n Remember you need to provide two input files and one input folder!")
+        sys.exit()
+    
+    if DESwoMANPath[-1:] != "/":
+        print(f"[Error:] The filepath '{DESwoMANPath}' you provided is not in the correct format.\nPlease provide the filepath like this: '/home/usr/deswoman/\nPlease run again with the correct path!")
         sys.exit()
 
     print("Starting the analysis!")  

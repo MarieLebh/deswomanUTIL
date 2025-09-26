@@ -96,24 +96,24 @@ def main():
 
     #Check if all is correct
     if not DESwoMANPath:
-        print("No DESwoMAN path supplied. Exiting.")
+        print("[Error:] No DESwoMAN path supplied. Exiting.")
         sys.exit()
     elif (Choice == "both" or Choice == "transcript") and not GTF:
-        print("No transcriptome assembly path supplied. Exiting.")
+        print("[Error:] No transcriptome assembly path supplied. Exiting.")
         sys.exit()
 
     #Start running the analysis
     print("Welcome to the deswomanUTIL bed converter...\n\nStarting the file transformation now!\n")
     if Choice == "neORF":
         generate_final_file_orf(DESwoMANPath, Outname)
-        print("Your file was successfully transformed!!")
+        print("Your neORF bedfile was successfully transformed!!")
     elif Choice == "transcript":
         generate_final_file_transcript(GTF, Outname, DESwoMANPath)
-        print("Your file was successfully transformed!!")
+        print("Your transcript bedfile was successfully transformed!!")
     elif Choice == "both":
         generate_final_file_orf(DESwoMANPath, Outname)
         generate_final_file_transcript(GTF, Outname, DESwoMANPath)
-        print("Your files were successfully transformed!!")
+        print("Your files (neORF + transcript) were successfully transformed!!")
     print("Goodybe :D")
     
 if __name__ == "__main__":

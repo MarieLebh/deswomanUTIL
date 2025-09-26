@@ -570,16 +570,19 @@ def main():
     mutations = muts.split(",")
     frame = args.frameshift_score
     
-    #Check if all is correct
-    if not DESwoMANPath:
-        print("No argument supplied. Exiting...")
+    #Check if all is correct (this is not perfect, there is a lot to add but probs too overkill for such a small script)
+    if not DESwoMANPath or SpeciesList or Tree:
+        print("[Error:] One of the required input files/folders is missing. Please check!")
         sys.exit()
-    if os.path.isdir(DESwoMANPath) != True:
-        print("One of your input directories is not a directory. Exiting...")
+
+    if DESwoMANPath[-1:] != "/":
+        print(f"[Error:] The filepath '{DESwoMANPath}' you provided is not in the correct format.\nPlease provide the filepath like this: '/home/usr/deswoman/\nPlease run again with the correct path!")
         sys.exit()
+
     if not OrthoPath:
         OrthoPath = "NotSupplied"
         print("You did not supply an Orthogroup File. All neORFs are treated as if they have no detected coding Homologs.")
+
     #Start running the analysis
     print("Starting the analysis!\n\n")
     Valid_neORFs = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList, mutations, frame)     
