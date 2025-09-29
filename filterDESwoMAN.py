@@ -571,7 +571,7 @@ def main():
     frame = args.frameshift_score
     
     #Check if all is correct (this is not perfect, there is a lot to add but probs too overkill for such a small script)
-    if not DESwoMANPath or SpeciesList or Tree:
+    if not DESwoMANPath or not SpeciesList or not Tree:
         print("[Error:] One of the required input files/folders is missing. Please check!")
         sys.exit()
 

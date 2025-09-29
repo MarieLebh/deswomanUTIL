@@ -14,7 +14,7 @@ Some helper scripts to work with the DESwoMAN output.
 
 ## How to use:
 **Step1:**  Clone this repository:
-``https://github.com/MarieLebh/deswomanUTIL.git``
+``git clone https://github.com/MarieLebh/deswomanUTIL.git``
 
 **Step 2:**  Install [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) and/or [OrthoFinder](https://github.com/davidemms/OrthoFinder). For more details check the respective documentation. They need to be directly callable from the command line so you might have to add them to PATH.
 
