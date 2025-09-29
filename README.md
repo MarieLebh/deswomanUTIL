@@ -51,7 +51,7 @@ This script allows to select which mutations would be considered "enabling" and 
 
 The script will output all main DESwoMAN files in a separate folder (excluding intermediate files) filtered by the chosen parameters (mutations, te and/or rna). It will also include a new ".csv" file which includes all excluded neORFs and information on which filter they did not pass. 
 
-_**Example output:** In this example you can see that neORF1 was excluded because there was no validated noncoding homolog in an outgroup species. NeORF5 had a valid homolog that was noncoding but because it matched a TE it was excluded. In this example no RNA database was provided._
+_**Example output:** In this example neORF1 was excluded because it had no validated noncoding homolog in an outgroup species. Possibly there was no syntenic hit at all or the ORF could not be confidently deemed noncoding based on the specified mutations. NeORF5 had a valid homolog that was noncoding but because it matched a TE it was excluded as not de novo. In this example no RNA database was provided._
 | NeORF_id   | No_validated_noncoding_homolog | TEhit   | RNAhit |
 | -------- | ------- |-------- | ------- |
 |NeORF1 | YES |NO| NotSearched |
