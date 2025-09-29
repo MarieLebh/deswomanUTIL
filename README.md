@@ -29,25 +29,34 @@ That's it! Now you can use the individual scripts and work with your deswoman ou
 ## 1) Filter the DESwoMAN output with "filterDESwoMAN.py"
 
 > [!IMPORTANT]
-> This script allows to select which mutations would be considered "enabling" and thus the absence of which features would deem a homolog noncoding. Per default the presence of one of these mutations would deem the homolog "noncoding":
-> - Absence of a canonical start codon (ATG)
-> - Absence of a stop codon (TAA, TAG, TGA)
-> - Absence of complete transcription. That means not the complete homolog is transcribed. It can however be partly transcribed. There might also be antisense transcription.
-> - A premature stop codon in the first x % of the sequence (the x corresponds to the threshold selected during the preceeding DESwoMAN run).
-> - Less than 50 % of the reading frame is conserved in the homolog.
->
-> If none of these features are missing the homolog will be considered "potentially coding" and the script requires a noncoding homolog in a more distant outgroup. Otherwise the ORF is excluded as its _de novo_ status could not be confirmed.
-
-> [!IMPORTANT]
 > [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
 
 Filter the output of [DESwoMAN](https://github.com/AnnaGrBio/DESWOMAN) to get a dataset of high confidence _de novo_ originated neORFs.
 It is important that you did the following steps before running:
+
 1) You ran DESwoMAN on one or multiple species. The output for each species needs to be in a separate folder with the full name (e.g. DmelZI or DsubFAL). This is also true when you only ran it for one species!
 2) You have a newick tree with all species (in- and outgroups) in your analysis (even if you also have populations this tree needs to contain 4 letter species ids). It is important that all internal nodes are named. Also no polytonies are allowed as this will lead to errors!
 3) Your samples have a four letter species id optionally followed by a sample id (if applicable) e.g. Dmel (for _Drosophila melanogaster_) or Hsap (for _Homo sapiens_).
 
 <img width="650" height="400" alt="image" src="FilteringWorkflow.png" /><br /><br />
+
+This script allows to select which mutations would be considered "enabling" and thus the absence of which features would deem a homolog noncoding. Per default the presence of one of these mutations would deem the homolog "noncoding":
+- Absence of a canonical start codon (ATG)
+- Absence of a stop codon (TAA, TAG, TGA)
+- Absence of complete transcription. That means not the complete homolog is transcribed. It can however be partly transcribed. There might also be antisense transcription.
+- A premature stop codon in the first x % of the sequence (the x corresponds to the threshold selected during the preceeding DESwoMAN run).
+ Less than 50 % of the reading frame is conserved in the homolog.
+
+ If none of these features are missing the homolog will be considered "potentially coding" and the script requires a noncoding homolog in a more distant outgroup. Otherwise the ORF is excluded as its _de novo_ status could not be confirmed.
+
+The script will output all main DESwoMAN files in a separate folder (excluding intermediate files) filtered by the chosen parameters (mutations, te and/or rna). It will also include a new ".csv" file which includes all excluded neORFs and information on which filter they did not pass. 
+
+_**Example output:** In this example you can see that neORF1 was excluded because there was no validated noncoding homolog in an outgroup species. NeORF5 had a valid homolog that was noncoding but because it matched a TE it was excluded. In this example no RNA database was provided._
+| NeORF_id   | No_validated_noncoding_homolog | TEhit   | RNAhit |
+| -------- | ------- |-------- | ------- |
+|NeORF1 | YES |NO| NotSearched |
+|NeORF5 | NO |YES| NotSearched |
+...
 
 
 - `--accepted_mutations` Comma separated list of all mutations you want to count as noncoding. The possible mutations/features are:

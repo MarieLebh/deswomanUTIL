@@ -12,8 +12,7 @@ from io import StringIO
 GET A SUBSET OF HIGH CONFIDENCE DE NOVO ORFs
 This script filters the DESwoMAN output based on the noncoding homologs and a phylogeny
 Author: Marie
-Date: 16.05.25
-Edited: 04.08.25
+Created: 16.05.25
 
 How to run:
 usage: filterDESwoMAN.py [-h] [--te_db TE_DB] [--te_cov TE_COV] [--te_idt TE_IDT] [--te_eval TE_EVAL] [--ortho ORTHO] [--deswoman DESWOMAN] [--rna_check] [--te_check]
@@ -325,7 +324,7 @@ def compare2lists(list1:list, list2:list)->bool:
             return True
     return False
 
-def get_save_neORF(CodingDict:dict, NoncodingDict:dict, TEHitList:list, Tree:str)->list:
+def get_save_neORF(CodingDict:dict, NoncodingDict:dict, TEHitList:list, Tree:str, Output:bool)->list:
     """
     Compare two lists. If any item from list1 is in list2 it returns True.
 
@@ -334,6 +333,7 @@ def get_save_neORF(CodingDict:dict, NoncodingDict:dict, TEHitList:list, Tree:str
     -NoncodingDict(dict): Noncoding homologs
     -TEHitList(list): List of neORFs with a TE match
     -Tree(str): Path to the newick folder
+    -Output (bool): Print output?
 
     Returns:
     -list: A list of validated homologs
@@ -366,10 +366,29 @@ def get_save_neORF(CodingDict:dict, NoncodingDict:dict, TEHitList:list, Tree:str
             ToRemove.append(neORF)
 
     PercentageValid = round((len(Validated)/(len(Validated)+ len(ToRemove)))*100, 2)
-    print(f"Percentage of valid neORF:{PercentageValid} %\nNumber of safe validated neORFs:{len(Validated)}\nNumber of potentially non de novo neORF:{len(ToRemove)}")
+    if Output:
+        print(f"Percentage of valid neORF:{PercentageValid} %\nNumber of safe validated neORFs:{len(Validated)}\nNumber of potentially non de novo neORF:{len(ToRemove)}")
     
     return Validated
 
+def get_list_all_neORFs(SpeciesList:str, PathToDESwoMAN:str):
+    """
+    Generate a list with all neORF IDs
+
+    Parameters:
+    -SpeciesList (str): File with Species info
+    -PathToDESwoMAN (str): Path to the DESwoMAN output 
+
+    Returns:
+    -A list with all neORFs
+    """
+    NeORFlist = []
+    x = get_populations(SpeciesList)
+    for line in x: 
+        Prots =  SeqIO.to_dict(SeqIO.parse(f"{PathToDESwoMAN}/{line}/denovo_protein.fa", "fasta"))
+        for key in Prots:
+            NeORFlist.append(key +  "_" + line)
+    return NeORFlist
 
 def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, PathToTr:str, CoverageTr:float, EvalueTr:float, IdentityTr:float,Te_check:bool, rna_check:bool, Tree:str, SpeciesList:str, mutations:list, frame:float)->list:
     """
@@ -396,6 +415,7 @@ def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:floa
 
     Returns:
     -list: A list of validated homologs
+    dict: A dictionary with all neORFs that were filtered out (i.e. are not de novo) and with info on what step filtered them out
     """
     print("#####################\nFiltering the neORFs detected with DESwoMAN.\n#####################")
     CodingHomologs = read_orthogroups_info(Orthopath, PathToDESwoMAN, SpeciesList)
@@ -415,16 +435,34 @@ def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:floa
         NoHit2, Hit2 = [], []
     NoHit = list(set(NoHit1 + NoHit2) -  set(Hit1 + Hit2)) 
 
-    if not Te_check and not rna_check:
-        x = get_populations(SpeciesList)
-        for line in x: 
-            Prots =  SeqIO.to_dict(SeqIO.parse(f"{PathToDESwoMAN}/{line}/denovo_protein.fa", "fasta"))
-            for key in Prots:
-                NoHit.append(key +  "_" + line)
-    Validated = get_save_neORF(CodingHomologs, SpeciesWithHomologs, NoHit, Tree)
-    return Validated
+    if not Te_check and not rna_check: #If both are false then all neORFs are "no hit" (because they were not searched for)
+        NoHit = get_list_all_neORFs(SpeciesList, PathToDESwoMAN)
 
-def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesList:str):
+    Validated = get_save_neORF(CodingHomologs, SpeciesWithHomologs, NoHit, Tree, True)
+
+    #Finally we are interested to know which neORFs are excluded and what filtering step (if not multiple) the reason for this
+    AllneORFs = get_list_all_neORFs(SpeciesList, PathToDESwoMAN) #First we need all ORFs
+    NoHom = list(set(AllneORFs) - set(get_save_neORF(CodingHomologs, SpeciesWithHomologs, AllneORFs, Tree, False))) #Now we detect which have no valid homolog (here we ignore the ones that are automatically excluded due to TE/other hits)
+    ExclusionDict = {}
+    for neORF in AllneORFs:
+        UnvalidatedHom, TEhit, RNAhit = "NO", "NO", "NO"
+        if not rna_check:
+            RNAhit = "NotSearched"
+        if not Te_check:
+            TEhit = "NotSearched"
+        if neORF in NoHom:
+            UnvalidatedHom = "YES"
+        if neORF in Hit1:
+            TEhit = "YES"
+        if neORF in Hit2:
+            RNAhit = "YES"
+        if UnvalidatedHom == "NO" and RNAhit in ["NO", "NotSearched"] and TEhit in ["NO", "NotSearched"]:
+            continue
+        ExclusionDict [neORF] = [UnvalidatedHom, TEhit, RNAhit]     
+
+    return Validated, ExclusionDict
+
+def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesList:str, ExclusionDict:dict):
     """
     Redo all the DESwoMAN output files but now only with the accepted neORFs
 
@@ -433,6 +471,7 @@ def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesLis
     - Valid_neORFs (list): List of accepted de novo ORFs
     -Outpath: Name of the output file
     -SpeciesList (str): File with Species info
+    -ExclusionDict (dict): Dictionary with information on why some neORFs are excluded
 
     Returns:
     -Nothing
@@ -464,12 +503,17 @@ def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesLis
         #make a new directory for the filtered files
         subprocess.run(["mkdir", f"{Outpath}/{line}/"], check = True)
 
-        #Redo the protein file
+        #Redo the protein file and make an information file for the excluded ORFs (which filtering criteria excluded them)
         NewProt = open(f"{Outpath}/{line}/denovo_protein.fa", "w")
+        Filtered = open(f"{Outpath}/{line}/excluded_neORFs.csv", "w")
+        Filtered.write("NeORF_id,No_validated_noncoding_homolog,TEhit,RNAhit\n")
         for key, value in ProtFile.items():
+            if key + "_" + line in ExclusionDict:
+                Filtered.write(f"{key},{ExclusionDict[key + '_' + line][0]},{ExclusionDict[key + '_' + line][1]},{ExclusionDict[key + '_'+ line][2]}\n")
             if key + "_" + line in Valid_neORFs:
                 NewProt.write(f">{key}\n{value.seq}\n")
         NewProt.close()
+        Filtered.close()
 
         #Redo the nucleotide file
         NewNuc = open(f"{Outpath}/{line}/denovo_nucl.fa", "w")
@@ -585,8 +629,8 @@ def main():
 
     #Start running the analysis
     print("Starting the analysis!\n\n")
-    Valid_neORFs = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList, mutations, frame)     
-    create_output(DESwoMANPath, Valid_neORFs, Outpath, SpeciesList)
+    Valid_neORFs, ExclusionDict = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList, mutations, frame)     
+    create_output(DESwoMANPath, Valid_neORFs, Outpath, SpeciesList, ExclusionDict)
     print("\nFinished!")
     print("Goodybe :)")     
 
