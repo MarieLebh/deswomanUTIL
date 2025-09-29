@@ -9,7 +9,6 @@ GENERATE AN OUTPUT GFF WITH ALL DESwoMAN NeORFs
 Get a gff file with neORFs and information.
 Author: Marie
 Date: 10.09.2025
-Edited: 11.09.2025
 
 usage: getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus]
 

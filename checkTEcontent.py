@@ -10,7 +10,6 @@ from Bio import SeqIO
 CHECK THE TE CONTENT OF NEORFS USING A TE LIBRARY
 Author: Marie
 Date: 12.09.2025
-Edited: 12.09.2025
 """
 
 def count_items_higherX(llist:list, thresh:float)-> float: 

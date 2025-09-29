@@ -9,7 +9,6 @@ GENERATE AN OUTPUT BED FILE WITH ALL DESwoMAN NeORFs
 Get a bed file with either neORF or transcript coordinates
 Author: Marie
 Date: 10.09.2025
-Edited: 11.09.2025
 
 usage: getBEDfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--choice CHOICE]
 """

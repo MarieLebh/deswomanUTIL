@@ -10,7 +10,6 @@ from Bio import SeqIO
 Compare your neORFs with another de novo gene library (using blast) and get some stats of how similar they are
 Author: Marie
 Date: 18.09.2025
-Edited: 18.09.2025
 """
 
 def run_blastn(PathToFasta:str, PathToDB:str, Coverage:float, Evalue:float, Identity:float, Strand:str):
