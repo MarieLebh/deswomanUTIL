@@ -40,7 +40,7 @@ It is important that you did the following steps before running:
 
 <img width="650" height="400" alt="image" src="FilteringWorkflow.png" /><br /><br />
 
-This script allows to select which mutations would be considered "enabling" and thus the absence of which features would deem a homolog noncoding. Per default the presence of one of these mutations would deem the homolog "noncoding":
+This script allows to select which mutations would be considered "enabling" and thus the absence of which features would deem a homolog noncoding. Per default the presence of **one (!) of these mutations** would deem the homolog "noncoding":
 - Absence of a canonical start codon (ATG)
 - Absence of a stop codon (TAA, TAG, TGA)
 - Absence of complete transcription. That means not the complete homolog is transcribed. It can however be partly transcribed. There might also be antisense transcription.
@@ -59,7 +59,7 @@ _**Example output:** In this example neORF1 was excluded because it had no valid
 ...
 
 
-- `--accepted_mutations` Comma separated list of all mutations you want to count as noncoding. The possible mutations/features are:
+- `--accepted_mutations` Comma separated list of all mutations you want to count as noncoding. Be aware that only one (!) of them needs to be present. The possible mutations/features are:
     - **start** = Start codon (ATG) is missing or incomplete in the homolog
     - **stop** = Stop codon (TAA, TGA, TAG) is missing or incomplete in the homolog
     - **premature_stop** = There is a premature stop codon (TAA, TGA, TAG) within the first x % of the homolog (=whichever theshold was specified during the DESwoMAN run)
