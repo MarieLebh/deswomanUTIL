@@ -29,7 +29,7 @@ That's it! Now you can use the individual scripts and work with your deswoman ou
 > For the following scripts to work it is important that all transcripts  from your input gtf file are stranded (i.e. "+" or "-"). If you also have undirectional transcripts (".") you need to first assign them a strand. Be aware that this is not recommended as there is **no way** of actually correctly assigning a strand to these transcripts at this point of the analysis ([see here more explanation](https://github.com/gpertea/stringtie/issues/22)). This is why DESwoMAN enables you to remove these transcripts. If you for some reason want to keep them you can replace all unstranded transcript with a "+". But again note that there is no way of assigning the correct strand at this point. If you want to assign the antisense strand, switch the "+" with a "-".  <br />
 > ``` awk 'BEGIN{OFS=FS="\t"} {$7 = ($7 == "." ? "+" : $7)}1' Test/Transcriptomes/DmelFI.gtf > DmelFI.gtf```<br />
 > You can do this similarly with the DESwoMAN information file:<br />
-> ``` awk 'BEGIN{OFS=FS=","} {$2 = ($2 == "." ? "+" : $2)}1' Test/DESwoMAN/DmelFI/information_file.txt > information_file.txt```<br />
+> ``` awk 'BEGIN{OFS=FS=","} {$3 = ($3 == "." ? "+" : $3)}1' Test/DESwoMAN/DmelFI/information_file.txt > information_file.txt```<br />
 > Remember to eventually move the modified files to the correct folder.
 
 
