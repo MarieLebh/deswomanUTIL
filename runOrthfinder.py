@@ -98,9 +98,9 @@ def main():
     print("Starting the analysis!")
 
     if folder:
-        save_data(desw,specFile)
+        save_data(specFile,desw)
     else:
-        save_data(desw,specFile)
+        save_data(specFile,desw)
         run_Orthofinder(num_threads)
 
     print("Finished!")
