@@ -132,7 +132,7 @@ def main():
     parser.add_argument("--denovo_db", help="Path to a second de novo gene dataset to compare it to", type=str)
     parser.add_argument("--evalue", help="Blast evalue treshold (default = 0.01)", type=float, default = "0.01")
     parser.add_argument("--perc_ident", help="Blast percent identity treshold (default = 80)", type=float, default = "0.01")
-    parser.add_argument("--cov", help="Blast coverage treshold (default = 0.01)", type=float, default = "80")
+    parser.add_argument("--cov", help="Blast coverage treshold (default = 80)", type=float, default = "80")
     parser.add_argument("--type", help="Input (nuc for nucleotides = default, aa for amino acids)", type=str, default = "nuc")
     parser.add_argument("--plus", help="Only check the forward strand when checking for nucleotide hits",action="store_true")
 
