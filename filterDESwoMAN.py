@@ -214,13 +214,13 @@ def get_acceptable_noncoding_homologs(PathToDESwoMAN:str, CodingDict:dict, Speci
   
     return AcceptedHomologs, CodingDict
 
-def generateBlastInput(PathToDESwoMAN:str, SpeciesList:list)->list:
+def generateBlastInput(PathToDESwoMAN:str, SpeciesList:str)->list:
     """
     Generates the input file for Blast (i.e. all neORFs merged in one file)
 
     Parameters: 
     -PathToDESwoMAN(str): Path to the DESwoMAN folder
-    -SpeciesList: File with all species (.txts)
+    -SpeciesList (str): File with all species (.txts)
 
     Returns:
     -list: List of ORFs
@@ -596,11 +596,11 @@ def main():
     DESwoMANPath = args.deswoman
     OrthoPath = args.ortho
     Coverage = args.te_cov
-    Evalue = args.te_idt
-    Identity = args.te_eval
+    Evalue = args.te_eval
+    Identity = args.te_idt
     CoverageTr = args.tr_cov
-    EvalueTr = args.tr_idt
-    IdentityTr = args.tr_eval
+    EvalueTr = args.tr_eval
+    IdentityTr = args.tr_idt
     PathToTr = args.tr_db
     Strand = args.tr_strand
     DoTranscript = args.rna_check
