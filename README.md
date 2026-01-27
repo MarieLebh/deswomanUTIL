@@ -181,4 +181,4 @@ Do a simple nucleotide or protein blast between two de novo gene datasets (e.g. 
 - `--denovo_db` Path to the de novo gene database (fasta file, nucleotides or amino acids)
 
 __Usage:__
-```checkTEcontent.py [-h] [--NeORF NEORF] [--TE_db TE_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV]```
+```denovoDataComparator.py [-h] [--NeORF NEORF] [--denovo_db DENOVO_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV][--type TYPE] [--plus]```
