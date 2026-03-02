@@ -68,13 +68,17 @@ class App(ctk.CTk):
         self.build_run_button()
         self.update_visible_inputs()
 
-
-    #Define the input
     def build_inputs(self):
+        """
+        Defines the input
+        """
         for item in self.input_defs:
             self.add_input_row(*item)
 
     def add_input_row(self, label, arg, kind, choices=None):
+        """
+        Defines the input kinds
+        """
         frame = ctk.CTkFrame(self)
         frame.pack(fill="x", padx=20, pady=5)
 
@@ -122,8 +126,10 @@ class App(ctk.CTk):
                 command=lambda v=var, k=kind: self.browse(v, k)
             ).pack(side="right")
 
-    #Create the script selector
     def build_script_selector(self):
+        """
+        Create the script selector (i.e. bed vs gff transformation as done here)
+        """
         frame = ctk.CTkFrame(self)
         frame.pack(pady=20)
 
@@ -140,8 +146,10 @@ class App(ctk.CTk):
             variable=self.script_var
         ).pack(side="left")
 
-    #Add run button
     def build_run_button(self):
+        """
+        Add run button and defines what it sais
+        """
         self.run_button = ctk.CTkButton(
             self,
             text="Start File Conversion",
@@ -150,9 +158,10 @@ class App(ctk.CTk):
         )
         self.run_button.pack(pady=20)
 
-    #Define browsing
-
     def browse(self, var, kind):
+        """
+        Define browsing
+        """
         if kind == "file":
             path = filedialog.askopenfilename()
         elif kind == "folder":
@@ -164,6 +173,9 @@ class App(ctk.CTk):
             var.set(path)
 
     def update_visible_inputs(self):
+        """
+        Modify which input is visible based on script to run
+        """
         script = self.script_var.get()
         allowed_args = self.script_args.get(script, set())
 
@@ -181,6 +193,9 @@ class App(ctk.CTk):
                     var.set("")
 
     def run_script(self):
+        """
+        Run the script and exit when done
+        """
         script_name = self.script_var.get()
         script_path = self.script_map[script_name]
 
