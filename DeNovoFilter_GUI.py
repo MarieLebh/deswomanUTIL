@@ -8,7 +8,7 @@ from tkinter import filedialog
 import os #so that its runnable from wherever (hopefully)
 
 """
-This script creates a GUI for the deswomanUTIL file conversion scripts!
+This script creates a GUI for the deswomanUTIL de novo filter
 """
 
 ctk.set_appearance_mode("System")

@@ -294,7 +294,7 @@ def main():
     - Nothing
     """
     #Initialize all arguments
-    parser = argparse.ArgumentParser(description="Get high confidence neORFs from the DESwoMAN output",epilog="-------------------------")
+    parser = argparse.ArgumentParser(description="Get a gff file of neORFs from the DESwoMAN output",epilog="-------------------------")
     parser.add_argument("--deswoman", help="Path to the DESwoMAN info file", type=str)
     parser.add_argument("--gtf", help="Path to the transcriptome gtf file", type=str)
     parser.add_argument("--outname", help="Name of the output file (no file extension)", type=str, default = "DESwoMAN")
