@@ -1,5 +1,5 @@
 # deswomanUTIL
-Some helper scripts to work with the DESwoMAN output.
+
 <img width="1214" height="159" alt="image" src="Logo.png" />
 
 ## Content
@@ -10,7 +10,8 @@ Some helper scripts to work with the DESwoMAN output.
 [Format the DESwoMAN data for OrthoFinder and run it](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#4-prepare-deswoman-files-for-orthofinder-and-run-it-with-runorthofinderpy) <br />
 [Remove coding homologs from the DESwoMAN output (Step3) based on Orthofinder results](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#5-remove-coding-homologs-from-the-step-3-output-file-with-removecodingfromfile3py) <br />
 [Check how many neORFs overlap with TE using a fasta library](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#6-get-some-basic-te-statistics-with-checktecontentpy) <br />
-[Compare your neORFs with another (fasta) dataset and see how many are shared](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#7-get-a-fast-overview-how-many-sequences-your-dataset-shares-with-a-comparable-one-using-denovodatacomparatorpy)
+[Compare your neORFs with another (fasta) dataset and see how many are shared](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#7-get-a-fast-overview-how-many-sequences-your-dataset-shares-with-a-comparable-one-using-denovodatacomparatorpy)<br />
+[Collapse the Strategy 2 Orthogroups](https://github.com/MarieLebh/deswomanUTIL?tab=readme-ov-file#8-choose-one-representative-sequence-per-strategy-2-orthogroup-with-collapseOrthogroupsStrat2py)
 
 ## How to use:
 **Step1:**  Clone this repository:
@@ -37,6 +38,9 @@ That's it! Now you can use the individual scripts and work with your deswoman ou
 
 > [!IMPORTANT]
 > [Blast](https://blast.ncbi.nlm.nih.gov/Blast.cgi) needs to be installed and callable from the commandline if you want to blast against a TE or RNA database.
+
+> [!IMPORTANT]
+>A GUI is available to make it easier to select all necessary filters and parameters. Simply run: `python3 DeNovoFilter_GUI.py`
 
 Filter the output of [DESwoMAN](https://github.com/AnnaGrBio/DESWOMAN) to get a dataset of high confidence _de novo_ originated neORFs.
 It is important that you did the following steps before running:
@@ -95,13 +99,25 @@ _**Example output:** In this example neORF1 was excluded because it had no valid
 - `--tr_eval` Evalue for transcript search (float, default = 0.001)
 - `--tr_strand` Strand for the transcript search (string, default = "plus")
 - `--tree` Newick tree of all samples analyzed (needs internal node ids, str)
+- `--filter_type` To the TE and RNA blast search using the neORF or transcript. (default: neORF)
 
 __Usage:__
-```filterDESwoMAN.py [-h] [--te_db TE_DB] [--te_cov TE_COV] [--te_idt TE_IDT] [--te_eval TE_EVAL] [--ortho ORTHO] [--deswoman DESWOMAN] [--rna_check][--te_check] [--tr_db TR_DB] [--tr_cov TR_COV] [--tr_idt TR_IDT] [--tr_eval TR_EVAL] [--tr_strand TR_STRAND] [--out OUT][--tree TREE] [--species_file SPECIES_FILE] [--accepted_mutations ACCEPTED_MUTATIONS] [--frameshift_score FRAMESHIFT_SCORE]```
+```filterDESwoMAN.py [-h] [--te_db TE_DB] [--te_cov TE_COV] [--te_idt TE_IDT] [--te_eval TE_EVAL] [--ortho ORTHO] [--deswoman DESWOMAN] [--rna_check][--te_check] [--tr_db TR_DB] [--tr_cov TR_COV] [--tr_idt TR_IDT] [--tr_eval TR_EVAL] [--tr_strand TR_STRAND] [--out OUT][--tree TREE] [--species_file SPECIES_FILE] [--accepted_mutations ACCEPTED_MUTATIONS] [--frameshift_score FRAMESHIFT_SCORE] [--filter_type FILTER_TYPE]```
 
+You can plot your results with the function: `plotBeforeandAfter.py`
+
+__Usage:__
+```PlotBeforeandAfter.py [-h] [--speciesFile SPECIESFILE] [--raw RAW] [--filtered FILTERED]```
+
+- `--speciesFile` Path to the Species File (.txt) with all samples (one per line)
+- `--raw` Path to the DESwoMAN folder (raw, prior to filtering)
+- `--filtered` Path to the DESwoMAN folder (filtered, after!! filtering)
 
 
 ## 2) Extract Gff files from the DESwoMAN output with "getGFFfromOut.py"
+> [!IMPORTANT]
+>A GUI is available for the file conversion. Simply run: `python3 FileConversion_GUI.py`
+
 Generate a [gff file](https://www.ensembl.org/info/website/upload/gff.html) (including exon, cds, utr and start/stop codon positions) with all neORF candidates from the DESwoMAN info file. 
 
 - `--deswoman` Path to the deswoman information file
@@ -115,6 +131,9 @@ __Usage:__
 ```getGFFfromOut.py [-h] [--deswoman DESWOMAN] [--gtf GTF] [--outname OUTNAME] [--add_stringtie_locus] [--collapse_denovo] [--collapse_orf]```
 
 ## 3) Extract BED files from the DESwoMAN output with "getBEDfromOut.py"
+> [!IMPORTANT]
+>A GUI is available for the file conversion. Simply run: `python3 FileConversion_GUI.py`
+
 Generate a [BED file](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bed-format) with neORF and/or transcript coordinates from the DESwoMAN output. Be aware that this script only produces BED6 format.
 
 - `--deswoman` Path to the deswoman information file
@@ -181,4 +200,24 @@ Do a simple nucleotide or protein blast between two de novo gene datasets (e.g. 
 - `--denovo_db` Path to the de novo gene database (fasta file, nucleotides or amino acids)
 
 __Usage:__
-```denovoDataComparator.py [-h] [--NeORF NEORF] [--denovo_db DENOVO_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV][--type TYPE] [--plus]```
+```checkTEcontent.py [-h] [--NeORF NEORF] [--TE_db TE_DB] [--evalue EVALUE] [--perc_ident PERC_IDENT] [--cov COV]```
+
+## 8) Choose one representative sequence per strategy 2 orthogroup with "collapseOrthogroupsStrat2.py"
+
+Collapse the strategy 2 orthogroups by choosing a representative sequence or by collapsing the genomic coordinates.
+
+> [!IMPORTANT]
+> Note that the choice parameter impacts the output you will get. If you choose to select a representative sequence ("longest" or "random"), the output will be two modified fasta files (nucleotide and protein) as well as a modified input file reduced to only the representative sequences. If you choose to collapse the genomic coordinates ("longest"), you will get a bedfile with these new coordinates. No fasta file is provided! 
+
+> [!IMPORTANT]
+> If you choose the "longest" option, the length is calculated based on the header. So it is essential that you keep the DESwoMAN naming scheme. 
+
+
+- `--deswoman` Path to the deswoman output folder 
+- `--choice` Strategy to find a representative sequence per orthogroup (default = longest). Options are:
+    - `longest`: The longest ORF (based on **coding (!)** sequence) <br />
+    - `random`: A randomly chosen ORF from the orthogroup. <br />
+    - `locus`: The genomic coordinates are collapsed to the earliest start and latest end. <br />
+
+__Usage:__
+```collapseOrthogroupsStrat2.py [-h] [--deswoman DESWOMAN] [--choice CHOICE]```

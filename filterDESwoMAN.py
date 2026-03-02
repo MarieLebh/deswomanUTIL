@@ -7,6 +7,7 @@ import argparse
 import sys
 from Bio import Phylo
 from io import StringIO
+import datetime
 
 """
 GET A SUBSET OF HIGH CONFIDENCE DE NOVO ORFs
@@ -96,7 +97,7 @@ def read_orthogroups_info(OrthoPath:str, PathToDESwoMAN:str, SpeciesList:str)->d
     Make a dictionary with all coding homologs
 
     Parameters: 
-    -OrthoPath(str): Path to the "Orthogroups.txt" foöe
+    -OrthoPath(str): Path to the "Orthogroups.txt" 
     -PathToDESwoMAN(str): Path to the DESwoMAN folder
     - SpeciesList: File with all species (.txts)
 
@@ -214,13 +215,14 @@ def get_acceptable_noncoding_homologs(PathToDESwoMAN:str, CodingDict:dict, Speci
   
     return AcceptedHomologs, CodingDict
 
-def generateBlastInput(PathToDESwoMAN:str, SpeciesList:str)->list:
+def generateBlastInput(PathToDESwoMAN:str, SpeciesList:str, SeqTypeFilter:str)->list:
     """
     Generates the input file for Blast (i.e. all neORFs merged in one file)
 
     Parameters: 
     -PathToDESwoMAN(str): Path to the DESwoMAN folder
     -SpeciesList (str): File with all species (.txts)
+    -SeqTypeFilter (str): Use transcripts or neORFs
 
     Returns:
     -list: List of ORFs
@@ -228,11 +230,22 @@ def generateBlastInput(PathToDESwoMAN:str, SpeciesList:str)->list:
     x = get_populations(SpeciesList)
     ORF_list = []
     BlastFile = open("neORFs_Nuc_all.fa", "w")
-    for line in x: 
-        Nuc_dict = SeqIO.to_dict(SeqIO.parse(f"{PathToDESwoMAN}/{line}/denovo_nucl.fa", "fasta"))
-        for key, value in Nuc_dict.items():     
-            BlastFile.write(f">{key}_{line}\n{value.seq}\n")
-            ORF_list.append(key + "_" + line)
+    if SeqTypeFilter != "transcript":
+        #Use the ORF
+        for line in x: 
+            Nuc_dict = SeqIO.to_dict(SeqIO.parse(f"{PathToDESwoMAN}/{line}/denovo_nucl.fa", "fasta"))
+            for key, value in Nuc_dict.items():     
+                BlastFile.write(f">{key}_{line}\n{value.seq}\n")
+                ORF_list.append(key + "_" + line)
+
+    else:
+        #Use the transcript
+        for line in x: 
+            Nuc_dict = SeqIO.to_dict(SeqIO.parse(f"{PathToDESwoMAN}/{line}/denovo_nucl.fa", "fasta"))
+            Tr_dict = SeqIO.to_dict(SeqIO.parse(f"{PathToDESwoMAN}/{line}/denovo_transcripts.fa", "fasta"))
+            for key in Nuc_dict:     
+                BlastFile.write(f">{key}_{line}\n{Tr_dict[key.split('_')[0]].seq}\n")
+                ORF_list.append(key + "_" + line)
     BlastFile.close()
     return ORF_list
 
@@ -284,7 +297,7 @@ def get_TE_neORFs(ORF_list:list)->tuple[list,list]:
     print(f"Percentage excluded due to Sequence overlap:{PercentageExcluded} %\nNumber kept:{len(NoHit)}\nNumber removed:{len(set(HitList))}")
     return list(NoHit), list(set(HitList))
 
-def run_blast_operation(PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, SpeciesList:str)->tuple[list,list]:
+def run_blast_operation(PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, SpeciesList:str, SeqTypeFilter:str)->tuple[list,list]:
     """
     Function for the complete blast workflow. 
 
@@ -296,12 +309,13 @@ def run_blast_operation(PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue
     -Identity (float): Percent identity for blast
     -Strand (str): Search forward only/reverse/both?
     -SpeciesList(str): Path to the Species File
+    -SeqTypeFilter (str): Sequence type for TE filter
 
 
     Returns:
     -tuple[list,list]: Two lists (one with hits one with no hits)
     """
-    ORF_list =  generateBlastInput(PathToDESwoMAN, SpeciesList)
+    ORF_list =  generateBlastInput(PathToDESwoMAN, SpeciesList, SeqTypeFilter)
     run_blast_te(PathToTE, Coverage, Evalue, Identity, Strand)
     NoHit, Hit = get_TE_neORFs(ORF_list)
     os.remove("Blast_out")
@@ -390,7 +404,7 @@ def get_list_all_neORFs(SpeciesList:str, PathToDESwoMAN:str):
             NeORFlist.append(key +  "_" + line)
     return NeORFlist
 
-def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, PathToTr:str, CoverageTr:float, EvalueTr:float, IdentityTr:float,Te_check:bool, rna_check:bool, Tree:str, SpeciesList:str, mutations:list, frame:float)->list:
+def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:float, Evalue:float, Identity:float, Strand:str, PathToTr:str, CoverageTr:float, EvalueTr:float, IdentityTr:float,Te_check:bool, rna_check:bool, Tree:str, SpeciesList:str, mutations:list, frame:float, SeqTypeFilter:str)->list:
     """
     Run the whole filtering analysis:
 
@@ -412,26 +426,27 @@ def filter_neORFs(Orthopath:str, PathToDESwoMAN:str, PathToTE:str, Coverage:floa
     -SpeciesList (str): File with Species info
     -mutations (list): list with accepted mutations
     -frame (float): Maximum percentage of the sequence not affected by frameshift to still count as noncoding
+    -SeqTypeFilter (str): Use whole transcript sequence or only the ORF for the TE search
 
     Returns:
     -list: A list of validated homologs
     dict: A dictionary with all neORFs that were filtered out (i.e. are not de novo) and with info on what step filtered them out
     """
-    print("#####################\nFiltering the neORFs detected with DESwoMAN.\n#####################")
+    print("-------------------------\nFiltering the neORFs detected with DESwoMAN.\n-------------------------")
     CodingHomologs = read_orthogroups_info(Orthopath, PathToDESwoMAN, SpeciesList)
     SpeciesWithHomologs, CodingHomologs = get_acceptable_noncoding_homologs(PathToDESwoMAN, CodingHomologs,SpeciesList, mutations, frame)
     if Te_check:
-        print("#####################\nStarting the TE filter:")
-        NoHit1, Hit1 = run_blast_operation(PathToDESwoMAN, PathToTE, Coverage, Evalue, Identity, "both", SpeciesList)
+        print("-------------------------\nStarting the TE filter:")
+        NoHit1, Hit1 = run_blast_operation(PathToDESwoMAN, PathToTE, Coverage, Evalue, Identity, "both", SpeciesList, SeqTypeFilter)
     else:
-        print("#####################\nNo TE search specified... Skipping TE Blast...\n#####################")
+        print("-------------------------\nNo TE search specified... Skipping TE Blast...\n-------------------------")
         NoHit1, Hit1 = [], []
     if rna_check:
-        print("#####################\nStarting the RNA filter:")
-        NoHit2, Hit2 = run_blast_operation(PathToDESwoMAN, PathToTr, CoverageTr, EvalueTr, IdentityTr, Strand, SpeciesList)
-        print("#####################") 
+        print("-------------------------\nStarting the RNA filter:")
+        NoHit2, Hit2 = run_blast_operation(PathToDESwoMAN, PathToTr, CoverageTr, EvalueTr, IdentityTr, Strand, SpeciesList,SeqTypeFilter)
+        print("-------------------------") 
     else:
-        print("#####################\nNo RNA search specified... Skipping Nucleotide Blast...\n#####################")
+        print("-------------------------\nNo RNA search specified... Skipping Nucleotide Blast...\n-------------------------")
         NoHit2, Hit2 = [], []
     NoHit = list(set(NoHit1 + NoHit2) -  set(Hit1 + Hit2)) 
 
@@ -488,7 +503,7 @@ def create_output(PathToDESwoMAN:str, Valid_neORFs:list, Outpath:str, SpeciesLis
     subprocess.run(["mkdir", Outpath], check = True)
 
     x = get_populations(SpeciesList)
-    print("#####################\nStarting to filter the DESwoMAN output\n#####################")
+    print("-------------------------\nStarting to filter the DESwoMAN output\n-------------------------")
     for line in x:
         
         print(f"Filtering for {line}")
@@ -571,6 +586,7 @@ def main():
     parser.add_argument("--te_cov", help="Coverage Blast against TE (Default = 80)", type=float, default= 80)
     parser.add_argument("--te_idt", help="Percent Identity Blast against TE (Default = 80)", type=float, default= 80)
     parser.add_argument("--te_eval", help="E value threshold Blast against TE (Default = 0.001)", type=float, default= 0.001)
+    parser.add_argument("--filter_type", help="Use whole transcript or ORF only for Blast filtering (default neORF)", type=str, default= "neORF")
     parser.add_argument("--ortho", help="Path to the Orthogroups.txt file from OrthoFinder", type=str)
     parser.add_argument("--deswoman", help="Path to the DESwoMAN Outputs folder (Default = working directory)", type=str, default = "")
     parser.add_argument("--rna_check", help="Blast against a rna database",action="store_true")
@@ -587,13 +603,11 @@ def main():
     parser.add_argument("--accepted_mutations", help="List all mutations to be accepted as noncoding", type=str, default="complete,start,stop,premature-stop,frameshift")
     parser.add_argument("--frameshift_score", help="Frameshift_score to be accepted as enough to deem a sequence noncoding.", type=float, default=50)
     
-
-    print("-------------------------\nFilter neORFs\nV.1.0\nAuthor:Marie Lebherz\n-------------------------\n")
-
     #Read the input    
     args = parser.parse_args()
     TEPath =args.te_db
-    DESwoMANPath = args.deswoman
+    SeqTypeFilter = args.filter_type
+    DESwoMANPath = args.deswoman + "/"
     OrthoPath = args.ortho
     Coverage = args.te_cov
     Evalue = args.te_eval
@@ -614,6 +628,16 @@ def main():
     mutations = muts.split(",")
     frame = args.frameshift_score
     
+    #Add a logfile
+    old_stdout = sys.stdout
+    log_file = open(f"deswomanUTIL_{datetime.datetime.today().date()}.log","w")
+    sys.stdout = log_file
+    print("-------------------------\nFilter neORFs\nV.1.0\nAuthor:Marie Lebherz\n-------------------------\n")
+
+    print("Selected filtering:")
+    for arg in vars(args):
+        print(arg, "=", getattr(args, arg))
+    print("-------------------------\n")
     #Check if all is correct (this is not perfect, there is a lot to add but probs too overkill for such a small script)
     if not DESwoMANPath or not SpeciesList or not Tree:
         print("[Error:] One of the required input files/folders is missing. Please check!")
@@ -627,12 +651,19 @@ def main():
         OrthoPath = "NotSupplied"
         print("You did not supply an Orthogroup File. All neORFs are treated as if they have no detected coding Homologs.")
 
+    if (DoTE or DoTranscript) and SeqTypeFilter not in ["neORF", "transcript"]:
+        print(f"[Error:] Invalid sequence type for the Blast filter. Please specify either: 'neORF' or 'transcript'. You specified {SeqTypeFilter}.")
+        sys.exit()
+
     #Start running the analysis
-    print("Starting the analysis!\n\n")
-    Valid_neORFs, ExclusionDict = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList, mutations, frame)     
+    print(f"Starting the analysis!\nCurrent time: {datetime.datetime.today()}\n")
+    Valid_neORFs, ExclusionDict = filter_neORFs(OrthoPath, DESwoMANPath, TEPath, Coverage, Evalue, Identity, Strand, PathToTr, CoverageTr, EvalueTr, IdentityTr,DoTE, DoTranscript, Tree, SpeciesList, mutations, frame, SeqTypeFilter)     
     create_output(DESwoMANPath, Valid_neORFs, Outpath, SpeciesList, ExclusionDict)
-    print("\nFinished!")
+    print(f"\nFinished!\nCurrent time: {datetime.datetime.today()}")
     print("Goodybe :)")     
+
+    sys.stdout = old_stdout
+    log_file.close()
 
 if __name__ == "__main__":
     main()
