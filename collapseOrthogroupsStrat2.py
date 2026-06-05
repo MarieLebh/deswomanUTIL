@@ -20,7 +20,7 @@ def get_orthogroups(PathToDESwoMAN:str)->dict:
     -dict: Dictionary with the orthogroups
     """
     Groups = {}
-    GroupFile = open(f"{PathToDESwoMAN}Orthogroup_output_step3.txt", "r")
+    GroupFile = open(f"{PathToDESwoMAN}Shared_neORFs_output_step3.txt", "r")
     for line in GroupFile:
         l = line.strip().split(":")
         Groups[l[0]] = l[1].split(",")
@@ -37,7 +37,7 @@ def collapse_by_ends(PathToDESwoMAN:str,Out:str)->dict:
     """
     #Make a dict but reverse to above
     Groups = {}
-    GroupFile = open(f"{PathToDESwoMAN}Orthogroup_output_step3.txt", "r")
+    GroupFile = open(f"{PathToDESwoMAN}Shared_neORFs_output_step3.txt", "r")
     for line in GroupFile:
         l = line.strip().split(":")
         for neORF in l[1].split(","):
